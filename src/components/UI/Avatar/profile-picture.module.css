@@ -1,0 +1,12 @@
+.crooper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 100px;
+}
+
+.preview {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #111;
+}
