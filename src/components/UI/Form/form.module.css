@@ -1,0 +1,18 @@
+.form {
+  
+}
+
+.input {
+  margin: 0 10px 0 0;
+  padding: 0 0 0 10px;
+  height: 40px;
+  width: 200px;
+  border: 1px solid #ffffff5d;
+  background: transparent;
+
+  transition: all 0.3s;
+}
+
+.input:focus {
+  border: 1px solid #fff;
+}
