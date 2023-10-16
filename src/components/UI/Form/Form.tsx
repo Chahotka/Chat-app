@@ -4,21 +4,33 @@ import Button from '../Button/Button'
 import { useProfileContext } from '../../../context/ProfileContext'
 import { UserDataInterface } from '../../../interfaces/UserDataInterface'
 import { useAuthContext } from '../../../context/AuthContext'
+import Input from '../Input/Input'
 
 const Form: React.FC = () => {
-  const [nickname, setNickname] = useState('')
+  const [nick, setNick] = useState('')
+  const [email, setEmail] = useState('')
+  const [nickStyles, setNickStyles] = useState([cl.inputBox])
+  const [emailStyles, setEmailStyles] = useState([cl.inputBox])
 
   const { setAuth } = useAuthContext()
   const { name, setName } = useProfileContext()
 
+  
+  const validateProfile = (nickname: string, email: string) => {
+    const nickExp = /^[\w-.]+$/
+    const emailExp = () => /^[\w-.]+@[\w-]+\.[a-z]{2,4}$/i.test(email)
+    console.log(emailExp())
+
+  }
+  
   const onSend = (e: React.PointerEvent) => {
     e.preventDefault()
-    if (nickname.length < 2 || nickname.length > 20) {
-      return
-    }
 
-    setAuth(true)
-    setName(nickname)
+    console.log(validateProfile(nick, email))
+
+    // setAuth(true)
+    // setName(nickname)
+    // sessionStorage.setItem('authorized', JSON.stringify(true))
   }
 
   useEffect(() => {
@@ -31,16 +43,13 @@ const Form: React.FC = () => {
 
 
   return (
-    <form className={cl.form}>
-      <input 
-        className={cl.input} 
-        value={nickname}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNickname(e.target.value)}
-        type="text"  
-        placeholder='Enter your nickname'
-      />
+    <form className={cl.form} autoComplete='off'>
+      <Input type='nick' />
+      <Input type='email' />
       <Button 
+        type='submit'
         text='save' 
+        styles={{width: '99.9%', marginTop: '15px'}}
         action={(e: React.PointerEvent) => onSend(e)}
       />
     </form>
