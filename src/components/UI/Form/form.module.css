@@ -1,15 +1,23 @@
 .form {
   margin: 20px 0 0 0;
-  width: 300px;
+  width: 350px;
   gap: 20px;
   display: grid;
   justify-content: center;
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-rows: min-content 1fr 1fr 1fr;
   grid-template-columns: 1fr;
 }
 
 .inputBox {
   position: relative;
+}
+
+.error {
+  color: #ad4335;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
 }
 
 .input {
@@ -28,6 +36,7 @@
 
 .label {
   color: #ffffff5d;
+  user-select: none;
 
   top: 50%;
   left: 10px;

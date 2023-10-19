@@ -11,14 +11,14 @@ interface Props {
 const Button: React.FC<Props> = ({text, type, styles, action}) => {
 
   return (
-    <button 
-      type={type ? type : 'button'}
-      className={cl.button} 
-      onClick={action} 
-      style={styles}
-    > 
-      { text } 
-    </button>
+      <button 
+        type={type ? type : 'button'}
+        className={cl.button} 
+        onClick={action} 
+        style={styles}
+      > 
+        { text } 
+      </button>
   )
 }
 
