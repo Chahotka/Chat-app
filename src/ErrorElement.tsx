@@ -1,20 +1,15 @@
 import React from 'react'
+import cl from './styles/error.module.css'
+import { useError } from './components/hooks/useError'
 
 const ErrorElement: React.FC = () => {
+  const message  = useError()
+
+  console.log(message)
 
   return (
-    <div
-      style={{
-        fontWeight: '700',
-        color: '#ad4335',
-        fontSize: '40px',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%,-50%)',
-        position: 'absolute',
-      }}
-    >
-      Error occured
+    <div className={cl.error}>
+      { message }
     </div>
   )
 }
