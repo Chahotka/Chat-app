@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import cl from './form.module.css'
 import Button from '../Button/Button'
 import Input from '../Input/Input'
@@ -11,9 +11,9 @@ const Form: React.FC = () => {
   const [nick, setNick] = useState(user.nick)
   const [email, setEmail] = useState(user.email)
   const [password, setPassword] = useState(user.password)
-  const [error, setError] = useState('')
 
-  const { onSend } = useCreateProfile(nick, email, password, setError)
+  const { onSend, error } = useCreateProfile(nick, email, password)
+  
   
   return (
     <>
