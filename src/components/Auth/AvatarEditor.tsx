@@ -29,9 +29,6 @@ const AvatarEditor: React.FC<Props> = ({setChangeAvatar}) => {
     setChangeAvatar(false)
   }
 
-  console.log(preview)
-
-
   return (
     <>
       <div className={cl.avatarContainer}>
