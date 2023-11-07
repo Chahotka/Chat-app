@@ -1,11 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAppDispatch } from '../../app/hooks'
-import { changeEmail, changeNick, changePassword } from '../../features/user/UserSlice'
+import { changeEmail, changeIsValid, changeNick, changePassword } from '../../features/user/UserSlice'
 
-export const useValidate = () => {
-  const [error, setError] = useState('')
-  const [isValid, setIsValid] = useState(false)
+export const useValidate = (
+  type: 'sign-in' | 'sign-up',
+  nick: string,
+  email: string,
+  password: string,
+  setError: React.Dispatch<React.SetStateAction<string>>
+) => {
   const dispatch = useAppDispatch()
+  const [isValid, setIsValid] = useState(false)
   
   const nickCheck = (nick: string) => {
     const regEx = /^[\w-.$]+/i
@@ -40,7 +45,8 @@ export const useValidate = () => {
   const passwordCheck = (password: string) => {
     const regEx = /(?=.*\d+)/
     const regEx2 = /(?=.*[a-z]+)/i
-    dispatch(changePassword(password))
+
+    dispatch(changePassword(nick))
 
     if (password.length < 5) {
       setError('Password is too short')
@@ -58,19 +64,23 @@ export const useValidate = () => {
     return true
   }
 
-  const validateProfile = (nick: string, email: string, password: string) => {
+  const validateProfile = () => {
     if (
       !nickCheck(nick) ||
       !emailCheck(email) ||
       !passwordCheck(password)
     ) {
-      console.log('Vse huinya')
+      dispatch(changeIsValid(false))
       return
     }
 
     setError('')
-    setIsValid(true)
+    dispatch(changeIsValid(true))
   }
 
-  return { validateProfile, error, isValid }
+  useEffect(() => {
+    if (type === 'sign-up' && (nick || email || password)) {
+      validateProfile()
+    }
+  }, [nick, email, password])
 }
