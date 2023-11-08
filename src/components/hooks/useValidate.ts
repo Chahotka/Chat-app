@@ -13,6 +13,9 @@ export const useValidate = (
   const [isValid, setIsValid] = useState(false)
   
   const nickCheck = (nick: string) => {
+    if (type !== 'sign-up') {
+      return true
+    }
     const regEx = /^[\w-.$]+/i
     dispatch(changeNick(nick))
 
@@ -46,7 +49,7 @@ export const useValidate = (
     const regEx = /(?=.*\d+)/
     const regEx2 = /(?=.*[a-z]+)/i
 
-    dispatch(changePassword(nick))
+    dispatch(changePassword(password))
 
     if (password.length < 5) {
       setError('Password is too short')
@@ -79,8 +82,10 @@ export const useValidate = (
   }
 
   useEffect(() => {
-    if (type === 'sign-up' && (nick || email || password)) {
+    if (nick || email || password) {
       validateProfile()
     }
+
+    console.log('email')
   }, [nick, email, password])
 }
