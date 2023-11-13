@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import cl from '../../styles/letter.module.css'
+import cl from '../../styles/sent.module.css'
 import { useAppDispatch } from '../../app/hooks'
 import { clearProfile } from '../../features/user/UserSlice'
 

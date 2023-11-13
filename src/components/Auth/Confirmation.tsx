@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import cl from '../../styles/sent.module.css'
 import { dbHandler } from '../../firebase/firebase'
 import { DocumentData, Timestamp } from 'firebase/firestore'
 import { useFetch } from '../hooks/useFetch'
+import Loader from '../UI/Loader/Loader'
 
 const Confirmation: React.FC = () => {
   const [verified, setVerified] = useState(false)
@@ -28,11 +30,13 @@ const Confirmation: React.FC = () => {
 
 
   return (
-    <div>
-      { verified ?
-        <p>Email verified</p>
-      :
-        <p>Vse huevo</p>
+    <div className={cl.sent}>
+      { loading ?
+        <Loader size='large' pos='center'/>
+        : verified ?
+          <p className={cl.text}>User verified</p>
+          :
+          <p className={cl.text}>User is not verificated</p>
       }
     </div>
   )
