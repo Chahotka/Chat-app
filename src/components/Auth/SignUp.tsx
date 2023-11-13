@@ -28,7 +28,7 @@ const SignUp: React.FC = () => {
       { changeAvatar && <AvatarEditor setChangeAvatar={setChangeAvatar}/> }
       { !changeAvatar &&
         <>
-          <Avatar changeAvatar={changeAvatar} setChangeAvatar={setChangeAvatar}/>
+          <Avatar avtSize='large' changeAvatar={changeAvatar} setChangeAvatar={setChangeAvatar}/>
           <Form 
             error={error}
             setError={setError}
