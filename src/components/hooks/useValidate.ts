@@ -1,33 +1,33 @@
 import React, { useState, useEffect } from 'react'
 import { useAppDispatch } from '../../app/hooks'
-import { changeEmail, changeIsValid, changeNick, changePassword } from '../../features/user/UserSlice'
+import { changeEmail, changeName, changePassword } from '../../features/user/UserSlice'
 
 export const useValidate = (
-  type: 'sign-in' | 'sign-up',
-  nick: string,
+  name: string,
   email: string,
   password: string,
-  setError: React.Dispatch<React.SetStateAction<string>>
+  setError: React.Dispatch<React.SetStateAction<string>>,
 ) => {
   const dispatch = useAppDispatch()
-  const [isValid, setIsValid] = useState(false)
   
-  const nickCheck = (nick: string) => {
-    if (type !== 'sign-up') {
-      return true
-    }
+  const nameCheck = (name: string) => {
     const regEx = /^[\w-.$]+/i
-    dispatch(changeNick(nick))
+    dispatch(changeName(name))
 
-    if (nick.length < 4) {
-      setError('Nick is too short')
-      return 
-    } else if (nick.length > 20) {
-      setError('Nick is too long')
-      return 
-    } else if (!regEx.test(nick)) {
+    if (name.length === 0) {
+      setError('')
+      return false
+    } else if (name.length < 4) {
+      setError('name is too short')
+      return false
+    } else if (name.length > 20) {
+      setError('name is too long')
+      return false
+    } else if (!regEx.test(name)) {
       setError(`Don't use special `)
-      return 
+      return false
+    } else {
+      setError('')
     }
 
     return true
@@ -37,11 +37,17 @@ export const useValidate = (
     const regEx = /^[\w-.]+@[\w]+\.[a-z]{2,4}$/i
     dispatch(changeEmail(email))
 
-    if (!regEx.test(email)) {
+    console.log('email')
+
+    if (email.length === 0) {
+      setError('')
+      return false
+    } else if (!regEx.test(email)) {
       setError('Email is incorrect')
-      return 
+      return false
     }
 
+    setError('')
     return true
   }
 
@@ -51,41 +57,51 @@ export const useValidate = (
 
     dispatch(changePassword(password))
 
-    if (password.length < 5) {
+    if (password.length === 0) {
+      setError('')
+      return false
+    } else if (password.length < 5) {
       setError('Password is too short')
-      return
-    }
-    if (!regEx.test(password)) {
+      return false
+    } else if (!regEx.test(password)) {
       setError('Password must contain numbers')
-      return
-    }
-    if (!regEx2.test(password)) {
+      return false
+    } else if (!regEx2.test(password)) {
       setError('Password must contain letters')
-      return
-    }
-
-    return true
-  }
-
-  const validateProfile = () => {
-    if (
-      !nickCheck(nick) ||
-      !emailCheck(email) ||
-      !passwordCheck(password)
-    ) {
-      dispatch(changeIsValid(false))
-      return
+      return false
     }
 
     setError('')
-    dispatch(changeIsValid(true))
+    return true
   }
 
-  useEffect(() => {
-    if (nick || email || password) {
-      validateProfile()
+  const validateProfile = (
+    setValid: React.Dispatch<React.SetStateAction<boolean>> | undefined
+  ) => {
+    if (!setValid) {
+      return
     }
 
-    console.log('email')
-  }, [nick, email, password])
+    if (
+      !nameCheck(name) ||
+      !emailCheck(email) ||
+      !passwordCheck(password)
+    ) {
+      setValid(false)
+      return
+    }
+
+    setValid(true)
+  }
+
+  // useEffect(() => {
+  //   if (
+  //       name || email || password
+  //     ) {
+  //       console.log('validate')
+  //     validateProfile()
+  //   }
+  // }, [name, email, password])
+
+  return { validateProfile }
 }
