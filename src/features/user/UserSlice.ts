@@ -1,34 +1,30 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserState {
-  id: string
-  nick: string
-  email: string
-  avatar: string
-  password: string
-  verificated: boolean
+  id: string | null
+  name: string | null
+  email: string | null
+  avatar: string | null
+  password: string | null
 }
+
 const initialState: UserState = {
-  id: '',
-  nick: '',
-  email: '',
-  avatar: '',
-  password: '',
-  verificated: false,
+  id: null,
+  name: null,
+  email: null,
+  avatar: null,
+  password: null
 }
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    getUserProfile: (state, action: PayloadAction<UserState>) => {
+    setProfile: (state, action: PayloadAction<UserState>) => {
       state = action.payload
     },
-    createProfile: (state, action: PayloadAction<string>) => {
-      state.id = action.payload
-    },
-    changeNick: (state, action: PayloadAction<string>) => {
-      state.nick = action.payload
+    changeName: (state, action: PayloadAction<string>) => {
+      state.name = action.payload
     },
     changeEmail: (state, action: PayloadAction<string>) => {
       state.email = action.payload
@@ -38,18 +34,15 @@ const userSlice = createSlice({
     },
     changePassword: (state, action: PayloadAction<string>) => {
       state.password = action.payload
-    },
-    changeVerificated: (state, action: PayloadAction<boolean>) => {
-      state.verificated = action.payload
     }
   }
 })
 
 export const {
-  createProfile, 
-  changeNick, 
+  setProfile, 
+  changeName, 
   changeEmail, 
-  changeAvatar, 
+  changeAvatar,
   changePassword
 } = userSlice.actions
 
