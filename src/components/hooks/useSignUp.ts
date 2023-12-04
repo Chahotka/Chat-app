@@ -1,48 +1,51 @@
-import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { dbHandler, storageHandler } from '../../firebase/firebase'
+import { useAppSelector } from '../../app/hooks'
 import { useHash } from './useHash'
 import { useBlob64 } from './useBlob64'
-import { useEmail } from './useEmail'
 import { useNavigate } from 'react-router-dom'
 
 export const useSignUp = (
+  valid: boolean,
   setError: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const user = useAppSelector(state => state.user)
   const navigate = useNavigate()
-  const hashCode = useHash()
-  const sendMail = useEmail(user.email, user.nick)
+  const { salt, hash } = useHash(user.password)
   const avatarBlob = useBlob64(user.avatar)
 
+  
   const signUp = async (e: React.MouseEvent) => {
     e.preventDefault()
-    if (!user.isValid) {
-      return
-    }
-
-    const isInUse = await dbHandler.getUser(user.email)
-    if (isInUse) {
-      setError('Email is in use')
-      return
-    }
-
-    const hashed = hashCode(user.password)
-
-    await storageHandler.addAvatar(user.nick, avatarBlob)
-    const avatar = await storageHandler.getAvatar(user.nick)
-    
-    await dbHandler.addUser({
-      id: user.id,
-      nick: user.nick,
-      salt: hashed.salt,
-      email: user.email,
-      avatar: avatar,
-      password: hashed.hash,
-      verificated: false
+    const response = await fetch('http://localhost:5000/check-exist', {
+      method: 'POST',
+      headers: {
+        'Content-Type':'application/json'
+      },
+      body: JSON.stringify({email: user.email})
     })
+    const userExist = await response.json()
+    
+    if (!valid) {
+      setError('Fill your profile')
+      return
+    } else if (userExist) {
+      setError('User already exist')
+      return
+    }
 
-    // await sendMail()
-    navigate('/auth/letter-sent')
+
+    await fetch('http://localhost:5000/sign-up', {
+      method: 'POST',
+      headers: {
+        'Content-Type':'application/json'
+      },
+      body: JSON.stringify({
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        salt,
+        hash
+      })
+    })
   }
 
   return signUp
