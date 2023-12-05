@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 
 export const useSignUp = (
   valid: boolean,
-  setError: React.Dispatch<React.SetStateAction<string>>
+  setMessage: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const user = useAppSelector(state => state.user)
   const navigate = useNavigate()
@@ -15,25 +15,25 @@ export const useSignUp = (
   
   const signUp = async (e: React.MouseEvent) => {
     e.preventDefault()
-    const response = await fetch('http://localhost:5000/check-exist', {
+    const exist = await fetch('http://localhost:5000/check-exist', {
       method: 'POST',
       headers: {
         'Content-Type':'application/json'
       },
       body: JSON.stringify({email: user.email})
     })
-    const userExist = await response.json()
+    const userExist = await exist.json()
     
     if (!valid) {
-      setError('Fill your profile')
+      setMessage('Fill your profile')
       return
     } else if (userExist) {
-      setError('User already exist')
+      setMessage('User already exist')
       return
     }
 
 
-    await fetch('http://localhost:5000/sign-up', {
+    const created = await fetch('http://localhost:5000/sign-up', {
       method: 'POST',
       headers: {
         'Content-Type':'application/json'
@@ -46,6 +46,15 @@ export const useSignUp = (
         hash
       })
     })
+    const userCreated = await created.json()
+
+    if (userCreated) {
+      setMessage('Something went wrong')
+    } else {
+      setMessage('User created successfully')
+    }
+
+    setMessage('User created successfully')
   }
 
   return signUp

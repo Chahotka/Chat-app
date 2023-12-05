@@ -1,32 +1,49 @@
-import React, { useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import cl from './form.module.css'
 import Button from '../Button/Button'
 import Input from '../Input/Input'
-import { useCreateProfile } from '../../hooks/useCreateProfile'
 import { useAppSelector } from '../../../app/hooks'
+import { useValidate } from '../../hooks/useValidate'
+import Message from '../Message/Message'
 
-const Form: React.FC = () => {
+interface Props {
+  message: string,
+  setValid?: React.Dispatch<React.SetStateAction<boolean>> 
+  setMessage: React.Dispatch<React.SetStateAction<string>> 
+  type: 'sign-in' | 'sign-up'
+  btnAction: React.MouseEventHandler
+}
+
+const Form: React.FC<Props> = ({ 
+  setValid,
+  message,
+  setMessage,
+  type,
+  btnAction
+}) => {
   const user = useAppSelector(state => state.user)
+  const [name, setNick] = useState(user.name || '')
+  const [email, setEmail] = useState(user.email || '')
+  const [password, setPassword] = useState(user.password || '')
+  const { validateProfile } = useValidate(name, email, password, setMessage)
 
-  const [nick, setNick] = useState(user.nick)
-  const [email, setEmail] = useState(user.email)
-  const [password, setPassword] = useState(user.password)
+  useEffect(() => {
+    validateProfile(setValid)
+  }, [name, email, password])
 
-  const { onSend, error } = useCreateProfile(nick, email, password)
-  
-  
   return (
     <>
       <form className={cl.form} autoComplete='off'>
-        <p className={cl.error}>{ error }</p>
-        <Input type='nick' value={nick} setValue={setNick} />
+        <Message message={message} />
+        { type === 'sign-up' &&
+          <Input type='name' value={name} setValue={setNick} />
+        }
         <Input type='email' value={email} setValue={setEmail} />
         <Input type='password' value={password} setValue={setPassword} />
         <Button 
           type='submit'
           text='save'
-          styles={{marginTop: '20px'}}
-          action={(e: React.PointerEvent) => onSend(e)}
+          action={btnAction}
         />
       </form>
     </>

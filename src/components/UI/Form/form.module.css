@@ -2,22 +2,12 @@
   margin: 20px 0 0 0;
   width: 350px;
   gap: 20px;
-  display: grid;
-  justify-content: center;
-  grid-template-rows: min-content 1fr 1fr 1fr;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
 }
 
 .inputBox {
   position: relative;
-}
-
-.error {
-  color: #ad4335;
-  font-size: 15px;
-  font-weight: 700;
-  text-align: center;
-  letter-spacing: 1px;
 }
 
 .input {

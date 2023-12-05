@@ -6,7 +6,7 @@ export const useValidate = (
   name: string,
   email: string,
   password: string,
-  setError: React.Dispatch<React.SetStateAction<string>>,
+  setMessage: React.Dispatch<React.SetStateAction<string>>,
 ) => {
   const dispatch = useAppDispatch()
   
@@ -15,19 +15,19 @@ export const useValidate = (
     dispatch(changeName(name))
 
     if (name.length === 0) {
-      setError('')
+      setMessage('')
       return false
     } else if (name.length < 4) {
-      setError('name is too short')
+      setMessage('name is too short')
       return false
     } else if (name.length > 20) {
-      setError('name is too long')
+      setMessage('name is too long')
       return false
     } else if (!regEx.test(name)) {
-      setError(`Don't use special `)
+      setMessage(`Don't use special `)
       return false
     } else {
-      setError('')
+      setMessage('')
     }
 
     return true
@@ -37,17 +37,15 @@ export const useValidate = (
     const regEx = /^[\w-.]+@[\w]+\.[a-z]{2,4}$/i
     dispatch(changeEmail(email))
 
-    console.log('email')
-
     if (email.length === 0) {
-      setError('')
+      setMessage('')
       return false
     } else if (!regEx.test(email)) {
-      setError('Email is incorrect')
+      setMessage('Email is incorrect')
       return false
     }
 
-    setError('')
+    setMessage('')
     return true
   }
 
@@ -58,20 +56,20 @@ export const useValidate = (
     dispatch(changePassword(password))
 
     if (password.length === 0) {
-      setError('')
+      setMessage('')
       return false
     } else if (password.length < 5) {
-      setError('Password is too short')
+      setMessage('Password is too short')
       return false
     } else if (!regEx.test(password)) {
-      setError('Password must contain numbers')
+      setMessage('Password must contain numbers')
       return false
     } else if (!regEx2.test(password)) {
-      setError('Password must contain letters')
+      setMessage('Password must contain letters')
       return false
     }
 
-    setError('')
+    setMessage('')
     return true
   }
 
@@ -94,14 +92,6 @@ export const useValidate = (
     setValid(true)
   }
 
-  // useEffect(() => {
-  //   if (
-  //       name || email || password
-  //     ) {
-  //       console.log('validate')
-  //     validateProfile()
-  //   }
-  // }, [name, email, password])
-
+  
   return { validateProfile }
 }

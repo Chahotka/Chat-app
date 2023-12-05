@@ -1,0 +1,24 @@
+.message {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.error {
+  color: #ad4335;
+}
+
+.success {
+  color: #35ad45;
+}
+
+.link {
+  cursor: pointer;
+  font-weight: 400;
+  color: #fff;
+  text-decoration: underline;
+}

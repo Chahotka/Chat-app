@@ -1,0 +1,12 @@
+/* Null styles */
+@import 'null.css';
+/* Null styles */
+
+* {
+  color: #fff;
+  font-family: 'Montserrat';
+}
+
+body {
+  background: #000;
+}
