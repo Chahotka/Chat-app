@@ -9,14 +9,7 @@ import Loader from '../UI/Loader/Loader'
 const SignUp: React.FC = () => {
   const [valid, setValid] = useState(false)
   const [message, setMessage] = useState('')
-  const signUp = useSignUp(valid, setMessage)
-  const { loading, fetching } = useFetch(async (e: React.MouseEvent) => {
-    await signUp(e)
-    if (!message) {
-      setMessage('User created successfully')
-    }
-  }, setMessage)
-
+  const {signUp, loading} = useSignUp(valid, setMessage)
 
 
   return (
@@ -30,7 +23,7 @@ const SignUp: React.FC = () => {
         setMessage={setMessage}
         setValid={setValid}
         type='sign-up' 
-        btnAction={(e: React.MouseEvent) => fetching(e)}
+        btnAction={(e: React.MouseEvent) => signUp(e)}
       /> 
     </div>
   )

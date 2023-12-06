@@ -20,6 +20,7 @@ const Message: React.FC<Props> = ({ message }) => {
       setMessageStyles([cl.message, cl.success])
     } else {
       setShowLink(false)
+      setMessageStyles([cl.message, cl.error])
     }
   }, [message])
 
@@ -29,7 +30,14 @@ const Message: React.FC<Props> = ({ message }) => {
         className={messageStyles.join(' ')}
       >
         { message } 
-        { showLink && <p className={cl.link}>Sign In?</p> }
+        { showLink && 
+          <span 
+            className={cl.link}
+            onClick={() => navigate('/auth/sign-in')}
+          >
+            Sign In?
+          </span> 
+        }
       </p>
     </div>
   )

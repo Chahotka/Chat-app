@@ -2,18 +2,18 @@ import { useState } from "react";
 
 export const useFetch = (
   callback: Function,
-  setError: React.Dispatch<React.SetStateAction<string>>
+  setMessage: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const [loading, setLoading] = useState(false)
 
-
-  const fetching = async (e: React.MouseEvent) => {
+  const fetching = async () => {
     try {
-      setError('')
+      setMessage('')
       setLoading(true)
-      await callback(e)
+      await callback()
     } catch (e) {
-      setError('Something went wrong')
+      console.error('Ebat error occured: ', e)
+      setMessage('Something went wrong')
     } finally {
       setLoading(false)
     }

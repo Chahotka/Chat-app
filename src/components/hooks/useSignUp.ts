@@ -1,61 +1,53 @@
 import { useAppSelector } from '../../app/hooks'
+import { useEmailExist } from './useEmailExist'
+import { useFetch } from './useFetch'
 import { useHash } from './useHash'
-import { useBlob64 } from './useBlob64'
-import { useNavigate } from 'react-router-dom'
 
 export const useSignUp = (
   valid: boolean,
   setMessage: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const user = useAppSelector(state => state.user)
-  const navigate = useNavigate()
   const { salt, hash } = useHash(user.password)
-  const avatarBlob = useBlob64(user.avatar)
-
-  
-  const signUp = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    const exist = await fetch('http://localhost:5000/check-exist', {
-      method: 'POST',
-      headers: {
-        'Content-Type':'application/json'
-      },
-      body: JSON.stringify({email: user.email})
+  const chekcEmail = useEmailExist(user.email)
+  const fetchOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      ...user,
+      salt,
+      password: hash
     })
-    const userExist = await exist.json()
-    
-    if (!valid) {
-      setMessage('Fill your profile')
-      return
-    } else if (userExist) {
+  }
+
+  const { loading, fetching } = useFetch(async () => {
+    const emailInUse = await chekcEmail()
+    if (emailInUse) {
       setMessage('User already exist')
       return
     }
 
+    const response = await fetch('http://localhost:5000/sign-up', fetchOptions)
+    const userAdded = await response.json()
 
-    const created = await fetch('http://localhost:5000/sign-up', {
-      method: 'POST',
-      headers: {
-        'Content-Type':'application/json'
-      },
-      body: JSON.stringify({
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-        salt,
-        hash
-      })
-    })
-    const userCreated = await created.json()
-
-    if (userCreated) {
-      setMessage('Something went wrong')
-    } else {
+    if (userAdded) {
       setMessage('User created successfully')
     }
+  }, setMessage)
 
-    setMessage('User created successfully')
+  
+  const signUp = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    
+    if (!valid) {
+      setMessage('Fill your profile')
+      return
+    }
+
+    await fetching()
   }
 
-  return signUp
+  return {signUp, loading}
 }
