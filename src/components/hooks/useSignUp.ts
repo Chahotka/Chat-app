@@ -1,29 +1,24 @@
 import { useAppSelector } from '../../app/hooks'
 import { useEmailExist } from './useEmailExist'
 import { useFetch } from './useFetch'
-import { useHash } from './useHash'
 
 export const useSignUp = (
   valid: boolean,
   setMessage: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const user = useAppSelector(state => state.user)
-  const { salt, hash } = useHash(user.password)
-  const chekcEmail = useEmailExist(user.email)
+  const checkEmail = useEmailExist(user.email)
   const fetchOptions = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      ...user,
-      salt,
-      password: hash
-    })
+    body: JSON.stringify(user)
   }
 
   const { loading, fetching } = useFetch(async () => {
-    const emailInUse = await chekcEmail()
+    const emailInUse = await checkEmail()
+    
     if (emailInUse) {
       setMessage('User already exist')
       return
@@ -37,7 +32,6 @@ export const useSignUp = (
     }
   }, setMessage)
 
-  
   const signUp = async (e: React.MouseEvent) => {
     e.preventDefault()
     

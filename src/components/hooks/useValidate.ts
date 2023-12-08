@@ -6,7 +6,9 @@ export const useValidate = (
   name: string,
   email: string,
   password: string,
+  setValid: React.Dispatch<React.SetStateAction<boolean>> | undefined,
   setMessage: React.Dispatch<React.SetStateAction<string>>,
+  type: string
 ) => {
   const dispatch = useAppDispatch()
   
@@ -14,6 +16,10 @@ export const useValidate = (
     const regEx = /^[\w-.$]+/i
     dispatch(changeName(name))
 
+    if (type === 'sign-in') {
+      return true
+    }
+  
     if (name.length === 0) {
       setMessage('')
       return false
@@ -58,6 +64,8 @@ export const useValidate = (
     if (password.length === 0) {
       setMessage('')
       return false
+    } else if (type === 'sign-in') {
+      return true
     } else if (password.length < 5) {
       setMessage('Password is too short')
       return false
@@ -73,10 +81,8 @@ export const useValidate = (
     return true
   }
 
-  const validateProfile = (
-    setValid: React.Dispatch<React.SetStateAction<boolean>> | undefined
-  ) => {
-    if (!setValid) {
+  const validateProfile = () => {
+    if (typeof setValid === 'undefined') {
       return
     }
 
@@ -91,7 +97,6 @@ export const useValidate = (
 
     setValid(true)
   }
-
   
   return { validateProfile }
 }
