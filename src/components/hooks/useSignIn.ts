@@ -1,50 +1,65 @@
-import React from 'react'
-import { dbHandler } from '../../firebase/firebase'
+import React, { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { useHash } from './useHash'
-import { DocumentData } from 'firebase/firestore'
-import { authorize } from '../../features/Auth/AuthSlice'
-import { setUserProfile } from '../../features/user/UserSlice'
+import { useFetch } from './useFetch'
+import { useEmailExist } from './useEmailExist'
+import { setProfile } from '../../features/user/UserSlice'
+import { authorize } from '../../features/auth/AuthSlice'
 import { useNavigate } from 'react-router-dom'
 
 export const useSignIn = (
-  setError: React.Dispatch<React.SetStateAction<string>>
+  valid: boolean,
+  setMessage: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const user = useAppSelector(state => state.user)
-  const auth = useAppSelector(state => state.auth)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const hashed = useHash()
-  
+  const checkEmail = useEmailExist(user.email)
+  const [signed, setSigned] = useState(false)
+
+  useEffect(() => {
+    if (signed) {
+      navigate('/')
+    }
+  }, [signed])
+
+  const fetchOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(user)
+  }
+  const { loading, fetching } = useFetch(async () => {
+    const emailInUse = await checkEmail()
+
+    if (!emailInUse) {
+      setMessage('Email or password are wrong')
+      setSigned(false)
+    }
+
+    const response = await fetch('http://localhost:5000/sign-in', fetchOptions)
+    const userData = await response.json()
+
+    if (userData) {
+      dispatch(setProfile(userData))
+      dispatch(authorize())
+      setSigned(true)
+    } else {
+      setMessage('Email or password are wrong')
+      setSigned(false)
+    }
+  }, setMessage)
 
   const signIn = async (e: React.MouseEvent) => {
     e.preventDefault()
-    if (!user.isValid) {
-      setError('Enter info')
+
+    if (!valid) {
+      setMessage('Fill your profile')
       return
     }
 
-    const response: DocumentData | false = await dbHandler.getUser(user.email)
-    
-    if (response) {
-      if (hashed(user.password, response.salt).hash !== response.password) {
-        setError('Invalid email or password')
-        return
-      } else if (!response.verificated) {
-        setError('User is not verificated')
-        return
-      } else {
-        dispatch(setUserProfile(response))
-        dispatch(authorize())
-      }
-    } else {
-      setError('Invalid email or password')
-      return  
-    }
-
-    navigate('/')
+    await fetching()
   }
 
-  console.log(user.isValid)
-  return signIn
+  return { signIn, loading }
 }
