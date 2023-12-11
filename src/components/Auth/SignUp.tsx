@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import cl from '../../styles/sign.module.css'
 import Form from '../UI/Form/Form'
 import { useSignUp } from '../hooks/useSignUp'
-import { useFetch } from '../hooks/useFetch'
 import Loader from '../UI/Loader/Loader'
 
 
