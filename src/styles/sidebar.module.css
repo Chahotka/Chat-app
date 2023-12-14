@@ -49,6 +49,7 @@
   scale: 0;
 }
 .input {
+  width: 100%;
   padding: 4px 5px;
   background: transparent;
   border-radius: 10px;
