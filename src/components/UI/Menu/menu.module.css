@@ -1,11 +1,21 @@
-.burgerBox {
-  width: 25px;
-  height: 15px;
-  cursor: pointer;
+
+.menu {
+  padding: 15px 10px;
+  display: grid;
+  column-gap: 20px;
+  align-items: center;
+  grid-template-columns: min-content 1fr;
   position: relative;
 }
 
-.burgerBox::before, .burgerBox::after {
+.burger {
+  width: 25px;
+  height: 17px;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+.burger::before, .burger::after {
   content: '';
   width: 100%;
   height: 1px;
@@ -13,33 +23,37 @@
   position: absolute;
   transition: all 0.3s;
 }
-
-.burgerBox::before {
+.burger::before {
   top: 0;
 }
-
-.burgerBox::after {
+.burger::after {
   bottom: 0;
 }
-
-.burger {
-  display: block;
+.burgerSpan {
+  top: 8px;
   width: 100%;
   height: 1px;
-  top: 7px;
   background: #fff;
   position: absolute;
   transition: all 0.3s;
 }
-
-.burgerBox.active::before {
-  top: 7px;
+.burger.active::before {
+  top: 8px;
   rotate: 45deg;
 }
-.burgerBox.active::after {
+.burger.active::after {
+  bottom: 8px;
   rotate: -45deg;
-  bottom: 7px;
 }
-.burgerBox.active .burger {
+.burger.active .burgerSpan {
   scale: 0;
+}
+.input {
+  width: 100%;
+  padding: 4px 5px;
+  background: transparent;
+  border-radius: 10px;
+  border: 1px solid #fff;
+  position: relative;
+  z-index: 1;
 }

@@ -1,19 +1,32 @@
 import React, { useState } from 'react'
 import cl from './menu.module.css'
 
-const Menu: React.FC = () => {
-  const [active, setActive] = useState(false)
+interface Props {
+  name: string
+  setName: React.Dispatch<React.SetStateAction<string>>
+  active: boolean
+  setActive: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const Menu: React.FC<Props> = ({name, setName, active, setActive}) => {
 
   return (
-    <div 
-      onClick={() => setActive(prev => !prev)}
-      className={ active ?
-        [cl.burgerBox, cl.active].join(' ')
-        :
-        cl.burgerBox
-      }
-    >
-      <span className={cl.burger}></span>
+    <div className={cl.menu}>
+      <div 
+        className={ active 
+          ? [cl.burger, cl.active].join(' ') 
+          : cl.burger
+        }
+        onClick={() => setActive(prev => !prev)}
+      >
+        <span className={cl.burgerSpan}></span>
+      </div>
+      <input 
+        value={name} 
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} 
+        className={cl.input} 
+        type="text"
+      />
     </div>
   )
 }
