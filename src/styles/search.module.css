@@ -1,10 +1,3 @@
-.title {
-  margin-top: 25px;
-  font-size: 20px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
 .searchBg {
   display: flex;
   align-items: center;
@@ -24,12 +17,60 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  border: 1px solid #fff;
   background: #222;
+  border-radius: 10px;
+  position: relative;
+}
+
+.close {
+  top: 15px;
+  right: 15px;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.close:hover {
+  scale: 1.1;
+}
+.close:active {
+  scale: 0.9;
+}
+.close::before, .close::after {
+  content: '';
+  width: 100%;
+  height: 1px;
+  background: #fff;
+  position: absolute;
+  transition: all 0.3s;
+}
+.close::before {
+  top: 9px;
+  rotate: 45deg;
+}
+.close::after {
+  bottom: 10px;
+  rotate:-45deg;
+}
+
+.title {
+  margin-top: 45px;
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+
+.error {
+  color: #ad4335;
+  margin-top: 30px;
+  font-weight: 700;
+  height: 10px;
 }
 
 .inputBox {
-  margin-top: 70px;
+  margin-top: 20px;
   display: flex;
   align-items: center;
   border: 1px solid #fff;
@@ -58,15 +99,17 @@
 
 .selectLabel {
   color: #000;
+  font-weight: 700;
 }
 
 .select {
   color: #000;
+  font-weight: 700;
   background: transparent;
 }
 
 .option {
-  text-align: center;
   color: #000;
+  text-align: center;
 }
 
