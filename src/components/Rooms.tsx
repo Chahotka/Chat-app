@@ -1,27 +1,30 @@
-import React from 'react'
+import React, { useState } from 'react'
 import cl from '../styles/rooms.module.css'
+import { RoomUser } from '../interfaces/RoomUser'
+import Room from './Rooms/Room'
+import Sidebar from './Rooms/Sidebar'
+import { useFilter } from './hooks/useFilter'
+import AddRoom from './Rooms/AddRoom'
 
-const Rooms: React.FC = () => {
-  const arr = [1,1,1,1,1,1,1,1,1,1]
+interface Props {
+  users: RoomUser[]
+}
+
+const Rooms: React.FC<Props> = ({ users }) => {
+  const [name, setName] = useState('')
+  const { filteredUsers } = useFilter(name, users)
 
   return (
     <div className={cl.rooms}>
-      <ul className={cl.list}>
-        { arr.map(item => {
-          return (
-            <li className={cl.item} key={Math.random()}>
-              <div className={cl.avat}></div>
-              <div className={cl.info}>
-                <div className={cl.contact}>
-                  <p className={cl.name}>Room name</p>
-                  <p className={cl.time}>14:25</p>
-                </div>
-                <p className={cl.message}>Last message</p>
-              </div>
-            </li>
-          )
-        })}
-      </ul>
+      <Sidebar name={name} setName={setName} />
+      <AddRoom />
+      { users.length > 0 &&
+        <ul className={cl.roomsList}>
+          {filteredUsers.map(user =>
+            <Room user={user} key={user.id} />
+          )}
+        </ul>
+      }
     </div>
   )
 }

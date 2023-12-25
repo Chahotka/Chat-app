@@ -1,10 +1,25 @@
 .rooms {
-  width: 100%;
+  padding: 10px;
   background: #111;
+  height: 100%;
+  display: grid;
+  grid-template-rows: repeat(3, min-content);
+  overflow-y: scroll;
 }
 
 .roomsList {
+  margin-top: 20px;
   width: 100%;
-  display: flex;
-  flex-direction: column;
 }
+
+.rooms::-webkit-scrollbar {
+  width: 3px;
+}
+.rooms::-webkit-scrollbar-track {
+  background: transparent;
+}
+.rooms::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 20px;
+}
+
