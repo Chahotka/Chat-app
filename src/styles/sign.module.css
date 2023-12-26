@@ -19,3 +19,11 @@
   text-align: center;
 }
 
+.form {
+  margin: 20px 0 0 0;
+  width: 350px;
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+}
+

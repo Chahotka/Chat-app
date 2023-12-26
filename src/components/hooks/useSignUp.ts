@@ -4,16 +4,19 @@ import { useFetch } from './useFetch'
 
 export const useSignUp = (
   valid: boolean,
+  name: string,
+  email: string,
+  password:string,
   setMessage: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const user = useAppSelector(state => state.user)
-  const checkEmail = useEmailExist(user.email)
+  const checkEmail = useEmailExist(email)
   const fetchOptions = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(user)
+    body: JSON.stringify({name, email, password})
   }
 
   const { loading, fetching } = useFetch(async () => {
