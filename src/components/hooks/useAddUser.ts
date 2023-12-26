@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useFetch } from "./useFetch"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { UserState, addRoom } from "../../features/user/UserSlice"
@@ -11,6 +11,7 @@ export const useAddUser = (
   const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.user)
   const [error, setError] = useState('')
+  const storageRooms = localStorage.getItem('rooms')
   const fetchOptions = {
     method: 'POST',
     headers: {
@@ -18,7 +19,6 @@ export const useAddUser = (
     },
     body: JSON.stringify({searchText, searchBy})
   }
-
   const checkDuplicate = () => {
     let duplicatedUser = user.rooms.filter(room => 
       room[searchBy as keyof RoomUser] === searchText.toLowerCase())
@@ -44,8 +44,6 @@ export const useAddUser = (
       return
     }
 
-
-
     const response = await fetch('http://localhost:5000/search-user', fetchOptions)
     const data = await response.json()
 
@@ -54,6 +52,11 @@ export const useAddUser = (
       return
     } else if (data.status === 'success') {
       dispatch(addRoom(data.res))
+
+      if (typeof storageRooms === 'string') {
+        const rooms = JSON.parse(storageRooms)
+        localStorage.setItem('rooms', JSON.stringify([...rooms, data.res]))
+      }
     }
   }, setError)
 
