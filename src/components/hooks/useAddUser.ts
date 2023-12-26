@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useFetch } from "./useFetch"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
-import { addRoom } from "../../features/user/UserSlice"
+import { UserState, addRoom } from "../../features/user/UserSlice"
 import { RoomUser } from "../../interfaces/RoomUser"
 
 export const useAddUser = (
@@ -9,7 +9,7 @@ export const useAddUser = (
   searchBy: string
 ) => {
   const dispatch = useAppDispatch()
-  const rooms = useAppSelector(state => state.user.rooms)
+  const user = useAppSelector(state => state.user)
   const [error, setError] = useState('')
   const fetchOptions = {
     method: 'POST',
@@ -20,7 +20,7 @@ export const useAddUser = (
   }
 
   const checkDuplicate = () => {
-    let duplicatedUser = rooms.filter(room => 
+    let duplicatedUser = user.rooms.filter(room => 
       room[searchBy as keyof RoomUser] === searchText.toLowerCase())
 
     if (duplicatedUser.length > 0 ) {
@@ -38,6 +38,9 @@ export const useAddUser = (
       return
     } else if (checkDuplicate()) {
       setError('You adready added this user')
+      return
+    } else if (user[searchBy as keyof UserState] === searchText.toLowerCase()) {
+      setError(`You can't add yourself`)
       return
     }
 
