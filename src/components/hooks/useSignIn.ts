@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import React from 'react'
+import { useAppDispatch } from '../../app/hooks'
 import { useFetch } from './useFetch'
 import { useEmailExist } from './useEmailExist'
 import { setProfile } from '../../features/user/UserSlice'
@@ -7,34 +7,28 @@ import { authorize } from '../../features/auth/AuthSlice'
 import { useNavigate } from 'react-router-dom'
 
 export const useSignIn = (
-  valid: boolean,
-  setMessage: React.Dispatch<React.SetStateAction<string>>
+  email: string,
+  password: string,
+  setMessage: React.Dispatch<React.SetStateAction<string>>,
+  name?: string
 ) => {
-  const user = useAppSelector(state => state.user)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const checkEmail = useEmailExist(user.email)
-  const [signed, setSigned] = useState(false)
-
-  useEffect(() => {
-    if (signed) {
-      navigate('/')
-    }
-  }, [signed])
-
+  const checkEmail = useEmailExist(email)
   const fetchOptions = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(user)
+    body: JSON.stringify({email, password})
   }
+
   const { loading, fetching } = useFetch(async () => {
     const emailInUse = await checkEmail()
 
     if (!emailInUse) {
       setMessage('Email or password are wrong')
-      setSigned(false)
+      return
     }
 
     const response = await fetch('http://localhost:5000/sign-in', fetchOptions)
@@ -43,17 +37,16 @@ export const useSignIn = (
     if (userData) {
       dispatch(setProfile(userData))
       dispatch(authorize())
-      setSigned(true)
+      navigate('/')
     } else {
       setMessage('Email or password are wrong')
-      setSigned(false)
     }
   }, setMessage)
 
   const signIn = async (e: React.MouseEvent) => {
     e.preventDefault()
 
-    if (!valid) {
+    if (email.length < 6 || password.length < 5) {
       setMessage('Fill your profile')
       return
     }

@@ -1,22 +1,17 @@
-import React, { useState, useEffect } from 'react'
-import { useAppDispatch } from '../../app/hooks'
-import { changeEmail, changeName, changePassword } from '../../features/user/UserSlice'
+import React from 'react'
 
 export const useValidate = (
-  name: string,
   email: string,
   password: string,
   setValid: React.Dispatch<React.SetStateAction<boolean>> | undefined,
   setMessage: React.Dispatch<React.SetStateAction<string>>,
-  type: string
+  type: string,
+  name?: string
 ) => {
-  const dispatch = useAppDispatch()
-  
-  const nameCheck = (name: string) => {
+  const nameCheck = (name: string | undefined) => {
     const regEx = /^[\w-.$]+/i
-    dispatch(changeName(name))
 
-    if (type === 'sign-in') {
+    if (typeof name === 'undefined') {
       return true
     }
   
@@ -41,7 +36,6 @@ export const useValidate = (
 
   const emailCheck = (email: string) => {
     const regEx = /^[\w-.]+@[\w]+\.[a-z]{2,4}$/i
-    dispatch(changeEmail(email))
 
     if (email.length === 0) {
       setMessage('')
@@ -59,7 +53,6 @@ export const useValidate = (
     const regEx = /(?=.*\d+)/
     const regEx2 = /(?=.*[a-z]+)/i
 
-    dispatch(changePassword(password))
 
     if (password.length === 0) {
       setMessage('')
