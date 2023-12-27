@@ -9,8 +9,7 @@ import { useNavigate } from 'react-router-dom'
 export const useSignIn = (
   email: string,
   password: string,
-  setMessage: React.Dispatch<React.SetStateAction<string>>,
-  name?: string
+  setMessage: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()

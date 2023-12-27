@@ -17,7 +17,7 @@ export const useAddUser = (
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({searchText, searchBy})
+    body: JSON.stringify({creator: user.id, searchText, searchBy})
   }
   const checkDuplicate = () => {
     let duplicatedUser = user.rooms.filter(room => 
@@ -44,7 +44,7 @@ export const useAddUser = (
       return
     }
 
-    const response = await fetch('http://localhost:5000/search-user', fetchOptions)
+    const response = await fetch('http://localhost:5000/add-user', fetchOptions)
     const data = await response.json()
 
     if (data.status === 'error') {
