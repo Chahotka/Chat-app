@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
 import cl from '../../styles/sidebar.module.css'
 import Menu from '../UI/Menu/Menu'
-import AddRoom from './AddRoom'
+import { useEscape } from '../hooks/useEscape'
 
 interface Props {
   name: string
@@ -9,20 +9,32 @@ interface Props {
 }
 
 const Sidebar: React.FC<Props> = ({ name, setName }) => {
-  const [active, setActive] = useState(false)
+  const {sidebarActive, setSidebarActive, onEscape} = useEscape()
 
+  useEffect(() => {
+    window.addEventListener('keydown', onEscape)
+
+    return () => window.removeEventListener('keydown', onEscape)
+  }, [sidebarActive])
+  
   return (
     <>
       <Menu 
         name={name} 
         setName={setName} 
-        active={active} 
-        setActive={setActive}
+        active={sidebarActive} 
+        setActive={setSidebarActive}
       />
-      <div className={ active? [cl.sidebarBg, cl.active].join(' ') : cl.sidebarBg} onClick={() => setActive(false)}>
+      <div 
+        className={ sidebarActive ? 
+          [cl.sidebarBg, cl.active].join(' ') 
+          : 
+          cl.sidebarBg} onClick={() => setSidebarActive(false)
+        }
+      >
       </div>
       <div 
-        className={ active
+        className={ sidebarActive
           ? [cl.sidebar, cl.active].join(' ')
           : cl.sidebar
         }
