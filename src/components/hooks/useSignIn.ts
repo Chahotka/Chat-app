@@ -34,8 +34,11 @@ export const useSignIn = (
     const userData = await response.json()
 
     if (userData) {
-      dispatch(setProfile(userData))
+      sessionStorage.setItem('user', JSON.stringify(userData))
+
       dispatch(authorize())
+      dispatch(setProfile(userData))
+      
       navigate('/')
     } else {
       setMessage('Email or password are wrong')
