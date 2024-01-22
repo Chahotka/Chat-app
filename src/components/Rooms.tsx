@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import cl from '../styles/rooms.module.css'
 import { RoomUser } from '../interfaces/RoomUser'
-import Room from './Rooms/Room'
+import RoomsList from './Rooms/RoomsList'
 import Sidebar from './Rooms/Sidebar'
 import { useFilter } from './hooks/useFilter'
 import AddRoom from './Rooms/AddRoom'
@@ -9,14 +9,16 @@ import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { addRoom } from '../features/user/UserSlice'
 
 interface Props {
-  users: RoomUser[]
+  width: number
+  setWidth: React.Dispatch<React.SetStateAction<number>>
+  setActive: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const Rooms: React.FC<Props> = ({ users }) => {
+const Rooms: React.FC<Props> = ({ width, setActive }) => {
   const dispatch = useAppDispatch()
   const rooms = useAppSelector(state => state.user.rooms)
   const [name, setName] = useState('')
-  const { filteredUsers } = useFilter(name, users)
+  const { filteredUsers } = useFilter(name, rooms)
 
   useEffect(() => {
     if (rooms.length === 0) {
@@ -36,15 +38,23 @@ const Rooms: React.FC<Props> = ({ users }) => {
 
   return (
     <div className={cl.rooms}>
+      <div 
+        className={cl.sizer}
+        style={{
+          left: width <= 200 ? '200px' : width > window.innerWidth - 400 ? window.innerWidth - 400 : width
+        }}
+        onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => setActive(true)}
+      ></div>
       <Sidebar name={name} setName={setName} />
       <AddRoom />
-      { users.length > 0 &&
+      { rooms.length > 0 &&
         <ul className={cl.roomsList}>
           {filteredUsers.map(user =>
-            <Room user={user} key={user.id} />
+            <RoomsList user={user} key={user.id} />
           )}
         </ul>
       }
+      бля ебать
     </div>
   )
 }

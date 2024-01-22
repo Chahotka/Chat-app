@@ -9,9 +9,8 @@ import { authorize } from '../features/auth/AuthSlice'
 const Main: React.FC = () => {
   const dispatch = useAppDispatch()
   const authorized = useAppSelector(state => state.auth.authorized)
-  const [width, setWidth] = useState(250)
+  const [roomsWidth, setRoomsWidth] = useState(300)
   const [active, setActive] = useState(false)
-
 
   useEffect(() => {
     const userData = sessionStorage.getItem('user')
@@ -28,19 +27,16 @@ const Main: React.FC = () => {
     return <Navigate to='/auth' />
   }
 
-  console.log(active)
-
   return (
     <div 
-      className={cl.main}
+      className={active ? [cl.main, cl.resize].join(' ') : cl.main}
       style={{
-        gridTemplateColumns: `minmax(200px,${width}px) 1fr`
+        gridTemplateColumns: `minmax(200px,${roomsWidth <= 200 ? '200px' : roomsWidth > window.innerWidth - 400 ? window.innerWidth - 400 : roomsWidth}px) minmax(400px, 1fr)`
       }}
-      onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => setActive(true)}
       onMouseUp={(e: React.MouseEvent<HTMLDivElement>) => setActive(false)}
-      onMouseMove={(e: React.MouseEvent<HTMLDivElement>) => active && setWidth(e.clientX)}
+      onMouseMove={(e: React.MouseEvent<HTMLDivElement>) => active && setRoomsWidth(e.clientX)}
     >
-      <Rooms />
+      <Rooms width={roomsWidth} setWidth={setRoomsWidth} setActive={setActive}/>
       <Outlet />
     </div>
   )

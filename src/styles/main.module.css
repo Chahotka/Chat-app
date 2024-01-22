@@ -2,5 +2,10 @@
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: min-content 1fr;
+}
+
+.resize {
+  user-select: none;
+  cursor: col-resize;
 }
