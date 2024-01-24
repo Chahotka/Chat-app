@@ -5,12 +5,12 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { setProfile } from '../features/user/UserSlice'
 import { authorize } from '../features/auth/AuthSlice'
+import { useResizer } from './hooks/useResizer'
 
 const Main: React.FC = () => {
   const dispatch = useAppDispatch()
   const authorized = useAppSelector(state => state.auth.authorized)
-  const [roomsWidth, setRoomsWidth] = useState(300)
-  const [active, setActive] = useState(false)
+  const { resizing, setResizing, roomsWidth, grid, onMove } = useResizer()
 
   useEffect(() => {
     const userData = sessionStorage.getItem('user')
@@ -29,17 +29,19 @@ const Main: React.FC = () => {
 
   return (
     <div 
-      className={active ? [cl.main, cl.resize].join(' ') : cl.main}
+      className={resizing ? [cl.main, cl.resize].join(' ') : cl.main}
       style={{
-        gridTemplateColumns: `minmax(200px,${roomsWidth <= 200 ? '200px' : roomsWidth > window.innerWidth - 400 ? window.innerWidth - 400 : roomsWidth}px) minmax(400px, 1fr)`
+        gridTemplateColumns: grid
       }}
-      onMouseUp={(e: React.MouseEvent<HTMLDivElement>) => setActive(false)}
-      onMouseMove={(e: React.MouseEvent<HTMLDivElement>) => active && setRoomsWidth(e.clientX)}
+      onMouseUp={() => setResizing(false)}
+      onMouseMove={(e) => onMove(e)}
     >
-      <Rooms width={roomsWidth} setWidth={setRoomsWidth} setActive={setActive}/>
+      <Rooms width={roomsWidth} setActive={setResizing}/>
       <Outlet />
     </div>
   )
 }
 
 export default Main
+
+

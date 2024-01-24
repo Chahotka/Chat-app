@@ -1,4 +1,4 @@
 .room {
   display: grid;
-  grid-template-columns: 1fr minmax(200px, 1fr);
+  grid-template-columns: minmax(250px, 1fr) minmax(150px, 250px);
 }

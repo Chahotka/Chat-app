@@ -10,7 +10,6 @@ import { addRoom } from '../features/user/UserSlice'
 
 interface Props {
   width: number
-  setWidth: React.Dispatch<React.SetStateAction<number>>
   setActive: React.Dispatch<React.SetStateAction<boolean>>
 }
 
@@ -40,10 +39,8 @@ const Rooms: React.FC<Props> = ({ width, setActive }) => {
     <div className={cl.rooms}>
       <div 
         className={cl.sizer}
-        style={{
-          left: width <= 200 ? '200px' : width > window.innerWidth - 400 ? window.innerWidth - 400 : width
-        }}
-        onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => setActive(true)}
+        style={{left: width}}
+        onMouseDown={() => setActive(true)}
       ></div>
       <Sidebar name={name} setName={setName} />
       <AddRoom />
@@ -54,7 +51,6 @@ const Rooms: React.FC<Props> = ({ width, setActive }) => {
           )}
         </ul>
       }
-      бля ебать
     </div>
   )
 }
