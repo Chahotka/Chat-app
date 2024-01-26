@@ -1,19 +1,24 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RoomUser } from "../../interfaces/RoomUser";
 
 export interface UserState {
-  id: string | null
-  name: string | null
-  email: string | null
+  id: string
+  name: string
+  email: string
   avatar: string | null
-  password: string | null
+  password: string
+  activeRoom: RoomUser | null
+  rooms: RoomUser[]
 }
 
 const initialState: UserState = {
-  id: null,
-  name: null,
-  email: null,
+  id: '',
+  name: '',
+  email: '',
   avatar: null,
-  password: null
+  password: '',
+  activeRoom: null,
+  rooms: []
 }
 
 const userSlice = createSlice({
@@ -21,7 +26,11 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setProfile: (state, action: PayloadAction<UserState>) => {
-      state = action.payload
+      state.id = action.payload.id
+      state.name = action.payload.name
+      state.email = action.payload.email
+      state.avatar = action.payload.avatar
+      state.password = action.payload.password
     },
     changeName: (state, action: PayloadAction<string>) => {
       state.name = action.payload
@@ -34,6 +43,16 @@ const userSlice = createSlice({
     },
     changePassword: (state, action: PayloadAction<string>) => {
       state.password = action.payload
+    },
+    addRoom: (state, action: PayloadAction<RoomUser>) => {
+      state.rooms = [...state.rooms, action.payload]
+    },
+    setActiveRoom: (state, action: PayloadAction<RoomUser | null>) => {
+      if (action.payload) {
+        state.activeRoom = action.payload
+      } else {
+        state.activeRoom = null
+      }
     }
   }
 })
@@ -43,7 +62,9 @@ export const {
   changeName, 
   changeEmail, 
   changeAvatar,
-  changePassword
+  changePassword,
+  addRoom,
+  setActiveRoom
 } = userSlice.actions
 
 export default userSlice.reducer

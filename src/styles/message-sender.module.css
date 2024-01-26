@@ -1,0 +1,35 @@
+
+
+.sender {
+  padding: 5px;
+  display: grid;
+  grid-template-columns: 1fr 40px;
+  background: #222;
+}
+
+.input {
+  padding: 5px;
+  height: 16px;
+  resize: none;
+  color: #fff;
+  align-self: center;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0s;
+}
+
+.input::-webkit-scrollbar {
+  display: none;
+}
+
+.send {
+  width: 30px;
+  cursor: pointer;
+  align-self: end;
+  justify-self: center;
+  transition: all 0.3s;
+}
+
+.send:hover {
+  scale: 1.1;
+}
