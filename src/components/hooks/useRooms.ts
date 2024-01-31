@@ -22,10 +22,12 @@ export const useRooms = () => {
         },
         body: JSON.stringify(parsedUser.rooms)
       })
+
       const data = await response.json()
 
       setRooms(data)
       dispatch(addRooms(data))
+      sessionStorage.setItem('rooms', JSON.stringify(data))
     }
   }, setError)
 
@@ -36,17 +38,18 @@ export const useRooms = () => {
 
       if (typeof userRooms === 'string') {
         const rooms: RoomUser[] = JSON.parse(userRooms)
+        console.log(rooms)
 
         if (rooms.length === 0) {
           fetching()
         } else {
           setRooms(rooms)
         }
-      } else {
-        sessionStorage.setItem('rooms', '[]')
+      } else if (!sessionStorage.getItem('rooms')){
+        fetching()
       }
     }
   }, [])
 
-  return { rooms }
+  return { rooms, loading }
 }
