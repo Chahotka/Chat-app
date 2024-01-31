@@ -15,9 +15,10 @@ const Messages: React.FC<Props> = ({messages}) => {
       <ul className={cl.messages}>
         {messages.map(message => {
           const owner = message.userId === user.id
-          const date = {
-            hh: new Date(message.createdAt).getHours(),
-            min: new Date(message.createdAt).getMinutes()
+          const date = new Date(message.createdAt)
+          const dateObj = {
+            hh: date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
+            mm: date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
           }
 
           return (
@@ -26,7 +27,7 @@ const Messages: React.FC<Props> = ({messages}) => {
               className={owner ? [cl.message, cl.owner].join(' ') : cl.message}
             >
               {message.textOrPath}
-              {`${date.hh}:${date.min}`}
+              {`${dateObj.hh}:${dateObj.mm}`}
             </li>
             )
         })}

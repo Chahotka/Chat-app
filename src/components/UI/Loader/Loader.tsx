@@ -4,9 +4,10 @@ import cl from './loader.module.css'
 interface Props {
   size: 'large' | 'normal'
   pos?: 'center'
+  addStyles?: {}
 }
 
-const Loader: React.FC<Props> = ({size, pos}) => {
+const Loader: React.FC<Props> = ({size, pos, addStyles}) => {
   const styles = [cl.circle]
 
   if (size === 'large') {
@@ -15,7 +16,10 @@ const Loader: React.FC<Props> = ({size, pos}) => {
 
 
   return (
-    <div className={pos && cl.center}>
+    <div
+      className={pos && cl.center}
+      style={addStyles}
+    >
       <div className={styles.join(' ')}></div>
     </div>
   )

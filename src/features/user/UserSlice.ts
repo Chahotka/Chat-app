@@ -47,6 +47,9 @@ const userSlice = createSlice({
     addRoom: (state, action: PayloadAction<RoomUser>) => {
       state.rooms = [...state.rooms, action.payload]
     },
+    addRooms: (state, action: PayloadAction<RoomUser[]>) => {
+      state.rooms = action.payload
+    },
     setActiveRoom: (state, action: PayloadAction<RoomUser | null>) => {
       if (action.payload) {
         state.activeRoom = action.payload
@@ -64,6 +67,7 @@ export const {
   changeAvatar,
   changePassword,
   addRoom,
+  addRooms,
   setActiveRoom
 } = userSlice.actions
 

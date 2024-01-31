@@ -6,6 +6,7 @@ import { v4 } from 'uuid'
 import { dbHandler } from './firebase'
 import { hashPassword } from './hashPassword'
 import { Sign } from './interfaces/Sign'
+import { DocumentData } from 'firebase-admin/firestore'
 dotenv
 
 const app = express()
@@ -92,8 +93,20 @@ app.post('/add-user', async (req: Request, res:Response) => {
 })
 
 app.post('/get-rooms', async (req: Request, res:Response) => {
-  const {message, rooms} = await dbHandler.getRooms(req.body)
-  res.send(message)
+  const usersList = await dbHandler.getRooms(req.body)
+  const rooms: DocumentData[] = []
+
+  usersList.forEach(user => {
+    rooms.push({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      roomId: user.roomId
+    })
+  })
+
+  res.send(rooms)
 })
 
 app.listen(port, () => {

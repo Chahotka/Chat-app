@@ -77,19 +77,22 @@ export const dbHandler = {
     }
   },
   getRooms: async (roomsId: {userId: string, roomId: string}[]) => {
-    // future func for geting rooms on first launch
-    let rooms: DocumentData[] = []
-    const userRef = db.collection('users_list')
+    const rooms: DocumentData[] = []
+    const usersRef = db.collection('users_list')
+    
+    for (const element of roomsId) {
+      const userDoc = await usersRef.doc(element.userId).get()
+      const userData = userDoc.data()
 
-    roomsId.forEach(async (room) => {
-      const user = await userRef.doc(room.userId).get()
+      if (typeof userData !== 'undefined') {
+        rooms.push({
+          ...userData,
+          roomId: element.roomId
+        })
+      }
+    }
 
-      console.log(user.data())
-    })
-
-    const message = {message: "Nahui idi chto ne ponyatno"}
-
-    return {message, rooms}
+    return rooms
   }
 }
 
