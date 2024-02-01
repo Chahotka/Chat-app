@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
 import { useFetch } from "./useFetch"
 import { RoomUser } from "../../interfaces/RoomUser"
-import { useAppDispatch } from "../../app/hooks"
+import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { addRooms } from "../../features/user/UserSlice"
 
 export const useRooms = () => {
   const dispatch = useAppDispatch()
+  const userRooms = useAppSelector(state => state.user.rooms)
   const [rooms, setRooms] = useState<RoomUser[]>([])
   const [error, setError] = useState('')
 
@@ -38,7 +39,6 @@ export const useRooms = () => {
 
       if (typeof userRooms === 'string') {
         const rooms: RoomUser[] = JSON.parse(userRooms)
-        console.log(rooms)
 
         if (rooms.length === 0) {
           fetching()
@@ -48,8 +48,10 @@ export const useRooms = () => {
       } else if (!sessionStorage.getItem('rooms')){
         fetching()
       }
+    } else {
+      setRooms(prev => [...prev, ...userRooms])
     }
-  }, [])
+  }, [userRooms])
 
   return { rooms, loading }
 }

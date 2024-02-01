@@ -11,7 +11,7 @@ export const useAddUser = (
   const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.user)
   const [error, setError] = useState('')
-  const storageRooms = localStorage.getItem('rooms')
+  const storageRooms = sessionStorage.getItem('rooms')
   const fetchOptions = {
     method: 'POST',
     headers: {
@@ -55,7 +55,7 @@ export const useAddUser = (
 
       if (typeof storageRooms === 'string') {
         const rooms = JSON.parse(storageRooms)
-        localStorage.setItem('rooms', JSON.stringify([...rooms, data.res]))
+        sessionStorage.setItem('rooms', JSON.stringify([...rooms, data.res]))
       }
     }
   }, setError)
