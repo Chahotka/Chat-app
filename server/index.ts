@@ -4,15 +4,23 @@ import dotenv from 'dotenv/config'
 import cors from 'cors'
 import { v4 } from 'uuid'
 import { dbHandler } from './firebase'
+import { socketHandler } from './socket'
 import { hashPassword } from './hashPassword'
 import { Sign } from './interfaces/Sign'
 import { DocumentData } from 'firebase-admin/firestore'
+import { createServer } from "http";
+import { Server } from "socket.io";
 dotenv
 
-const app = express()
-const port = 5000
+export const app = express()
 
-dotenv
+const httpServer = createServer(app)
+const io = new Server(httpServer, {
+  cors: {
+    origin: 'http://localhost:3000'
+  }
+})
+
 app.use(cors())
 app.use(bp.json())
 app.use(bp.urlencoded({extended: true}))
@@ -109,6 +117,19 @@ app.post('/get-rooms', async (req: Request, res:Response) => {
   res.send(rooms)
 })
 
-app.listen(port, () => {
+app.listen(5000, () => {
   console.log('Listen on port: ', 5000, ' blya')
 })
+
+// SOCKET.IO
+
+io.on('connect', (socket) => {
+  socketHandler.onConnect(socket)
+
+  
+  socket.on('disconnect', () => {
+    socketHandler.onDisconnect(socket)
+  })
+})
+
+httpServer.listen(5001)

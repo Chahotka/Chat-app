@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../app/hooks'
 import { setProfile } from '../features/user/UserSlice'
 import { authorize } from '../features/auth/AuthSlice'
 import { useResizer } from './hooks/useResizer'
+import { socket } from '../socket/socket'
 
 const Main: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -13,6 +14,8 @@ const Main: React.FC = () => {
   const { resizing, setResizing, roomsWidth, grid, onMove } = useResizer()
 
   useEffect(() => {
+    socket.connect()
+
     const userData = sessionStorage.getItem('user')
 
     if (typeof userData === 'string') {
