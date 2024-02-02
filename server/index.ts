@@ -4,22 +4,13 @@ import dotenv from 'dotenv/config'
 import cors from 'cors'
 import { v4 } from 'uuid'
 import { dbHandler } from './firebase'
-import { socketHandler } from './socket'
+import {io, httpServer, socketHandler } from './socket'
 import { hashPassword } from './hashPassword'
 import { Sign } from './interfaces/Sign'
 import { DocumentData } from 'firebase-admin/firestore'
-import { createServer } from "http";
-import { Server } from "socket.io";
 dotenv
 
 export const app = express()
-
-const httpServer = createServer(app)
-const io = new Server(httpServer, {
-  cors: {
-    origin: 'http://localhost:3000'
-  }
-})
 
 app.use(cors())
 app.use(bp.json())
@@ -126,10 +117,14 @@ app.listen(5000, () => {
 io.on('connect', (socket) => {
   socketHandler.onConnect(socket)
 
+  socket.on('join', (roomId) => 
+    socketHandler.onJoin(socket, roomId)
+  )
   
-  socket.on('disconnect', () => {
+
+  socket.on('disconnect', () => 
     socketHandler.onDisconnect(socket)
-  })
+  )
 })
 
 httpServer.listen(5001)
