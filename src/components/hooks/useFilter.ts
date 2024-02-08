@@ -5,21 +5,21 @@ export const useFilter = (
   name: string,
   users: RoomUser[]
 ) => {
-  const [filteredUsers, setFilteredUsers] = useState<RoomUser[]>(users)
+  const [filteredRooms, setFilteredRooms] = useState<RoomUser[]>(users)
 
   useEffect(() => {
-    setFilteredUsers(users)
+    setFilteredRooms(users)
   }, [users])
 
   useEffect(() => {
     if (name.length > 0) {
-      setFilteredUsers(users.filter(user =>
+      setFilteredRooms(users.filter(user =>
           user.name.toLowerCase().includes(name.toLowerCase())
         ))
     } else {
-      setFilteredUsers(users)
+      setFilteredRooms(users)
     }
   }, [name])
 
-  return { filteredUsers }
+  return { filteredRooms }
 }

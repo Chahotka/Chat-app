@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useFetch } from "./useFetch"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { UserState, addRoom } from "../../features/user/UserSlice"
@@ -33,10 +33,7 @@ export const useAddUser = (
   const { fetching, loading } = useFetch(async () => {
     setError('')
 
-    if (searchText.length < 4) {
-      setError(`User ${searchBy} too short`)
-      return
-    } else if (checkDuplicate()) {
+    if (checkDuplicate()) {
       setError('You adready added this user')
       return
     } else if (user[searchBy as keyof UserState] === searchText.toLowerCase()) {
@@ -55,6 +52,7 @@ export const useAddUser = (
 
       if (typeof storageRooms === 'string') {
         const rooms = JSON.parse(storageRooms)
+        sessionStorage.setItem('user', JSON.stringify(user))
         sessionStorage.setItem('rooms', JSON.stringify([...rooms, data.res]))
       }
     }

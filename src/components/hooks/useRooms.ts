@@ -11,10 +11,10 @@ export const useRooms = () => {
   const [error, setError] = useState('')
 
   const { loading, fetching } = useFetch(async() => {
-    const user = sessionStorage.getItem('user')
+    const storageUser = sessionStorage.getItem('user')
 
-    if (typeof user === 'string') {
-      const parsedUser = JSON.parse(user)
+    if (typeof storageUser === 'string') {
+      const parsedUser = JSON.parse(storageUser)
       
       const response = await fetch('http://localhost:5000/get-rooms', {
         method: 'POST',
@@ -32,26 +32,32 @@ export const useRooms = () => {
     }
   }, setError)
 
+  const updateRooms = () => {
+    const storageRooms = sessionStorage.getItem('rooms')
 
-  useEffect(() => {
-    if (rooms.length === 0) {
-      const userRooms = sessionStorage.getItem('rooms')
+    if (typeof storageRooms === 'string') {
+      const parsedRooms = JSON.parse(storageRooms)
 
-      if (typeof userRooms === 'string') {
-        const rooms: RoomUser[] = JSON.parse(userRooms)
-
-        if (rooms.length === 0) {
-          fetching()
-        } else {
-          setRooms(rooms)
-        }
-      } else if (!sessionStorage.getItem('rooms')){
+      if (parsedRooms.length !== 0) {
+        setRooms(parsedRooms)
+        dispatch(addRooms(parsedRooms))
+      } else {
         fetching()
       }
     } else {
-      setRooms(prev => [...prev, ...userRooms])
+      fetching()
+    }
+  }
+
+  useEffect(() => {
+    updateRooms()
+  }, [])
+
+  useEffect(() => {
+    if (userRooms.length > 0) {
+      setRooms(userRooms)
     }
   }, [userRooms])
 
-  return { rooms, loading }
+  return { rooms, loading, setRooms }
 }
