@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { setActiveRoom } from "../../features/user/UserSlice"
+import { socket } from "../../socket/socket"
 
 export const useEscape = () => {
   const dispatch = useAppDispatch()
@@ -14,7 +15,8 @@ export const useEscape = () => {
 
     if (sidebarActive) {
       setSidebarActive(false)
-    } else {
+    } else if (activeRoom) {
+      socket.emit('leave', activeRoom.roomId)
       dispatch(setActiveRoom(null))
     }
   }

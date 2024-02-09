@@ -5,54 +5,62 @@ import { NavLink } from 'react-router-dom'
 import defImage from './Mogged.png'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { setActiveRoom } from '../../features/user/UserSlice'
-import { socket, socketHandler } from '../../socket/socket'
+import { socket } from '../../socket/socket'
 
 interface Props {
-  user: RoomUser
+  room: RoomUser
 }
 
-const RoomsList: React.FC<Props> = ({ user }) => {
+const RoomsList: React.FC<Props> = ({ room }) => {
   const dispatch = useAppDispatch()
-  const room = useAppSelector(state => state.user.activeRoom)
+  const user = useAppSelector(state => state.user)
 
   const onJoin = () => {
-    if (room !== null && room.id === user.id) {
+    if (user.activeRoom !== null && user.activeRoom.id === room.id) {
       return
     }
+    if (user.activeRoom) {
+      socket.emit('leave', user.activeRoom.id)
+    }
 
-    dispatch(setActiveRoom(user))
-    socketHandler.onJoin(user.roomId)
+    dispatch(setActiveRoom(room))
+    socket.emit('join', room.roomId)
+  }
+
+  const onJoined = (socketId: string, roomId: string) => {
+    if (room.roomId === roomId) {
+      console.log('SOCKET: ', socketId, ' JOINED ROOM: ', roomId)
+    }
+  }
+
+  const onLeft = (socketId: string, roomId: string) => {
+    if (room.roomId === roomId) {
+      console.log('SOCKET: ', socketId, 'LEFT ROOM: ', roomId)
+    }
   }
 
   useEffect(() => {
-    const onJoined = (socketId: string, roomId: string) => {
-      if (user.roomId !== roomId) {
-        return
-      }
-
-      console.log(socketId, ' Joined: ', roomId)
-    }
-
     socket.on('joined', onJoined)
-    
+    socket.on('left', onLeft)
+
     return () => {
       socket.off('joined', onJoined)
+      socket.off('left', onLeft)
     }
   }, [])
 
-
   return (
     <li onClick={onJoin} className={cl.room}>
-      <NavLink className={cl.link} to={`room/${user.roomId}`}>
+      <NavLink className={cl.link} to={`room/${room.roomId}`}>
         <div className={cl.avatar}>
-          <img src={user.avatar || defImage} alt="User avatar" />
+          <img src={room.avatar || defImage} alt="User avatar" />
         </div>
         <div className={cl.info}>
           <div className={cl.userInfo}>
-            <p className={cl.name}>{user.name}</p>
+            <p className={cl.name}>{room.name}</p>
             <p className={cl.time}>12:45</p>
           </div>
-          <p className={cl.message}>{user.email}</p>
+          <p className={cl.message}>{room.email}</p>
         </div>
       </NavLink>
     </li>

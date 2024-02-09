@@ -117,10 +117,17 @@ app.listen(5000, () => {
 io.on('connect', (socket) => {
   socketHandler.onConnect(socket)
 
-  socket.on('join', (roomId) => 
+  socket.on('connected', (userId: string) => {
+    socketHandler.onConnected(userId)
+  }) 
+
+  socket.on('join', (roomId: string) => 
     socketHandler.onJoin(socket, roomId)
   )
   
+  socket.on('leave', (roomId: string) => {
+    socketHandler.onLeave(socket, roomId)
+  })
 
   socket.on('disconnect', () => 
     socketHandler.onDisconnect(socket)

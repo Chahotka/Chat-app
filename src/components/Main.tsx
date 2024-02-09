@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import cl from '../styles/main.module.css'
 import Rooms from './Rooms'
 import { Navigate, Outlet } from 'react-router-dom'
@@ -10,21 +10,40 @@ import { socket } from '../socket/socket'
 
 const Main: React.FC = () => {
   const dispatch = useAppDispatch()
+  const user = useAppSelector(state => state.user)
   const authorized = useAppSelector(state => state.auth.authorized)
   const { resizing, setResizing, roomsWidth, grid, onMove } = useResizer()
 
+  const onConnect = () => {
+    socket.emit('connected', user.id)
+  }
+  const onConnected = (userId: string) => {
+    console.log('Socket ID: ', socket.id)
+  }
+
   useEffect(() => {
-    socket.connect()
+    if (!socket.connected) {
+      socket.connect()
+  
+      const userData = sessionStorage.getItem('user')
+  
+      if (typeof userData === 'string') {
+        const user = JSON.parse(userData)
+  
+        dispatch(authorize())
+        dispatch(setProfile(user))
+      }
+    }
 
-    const userData = sessionStorage.getItem('user')
+    socket.on('connect', onConnect)
+    socket.on('connected', onConnected)
 
-    if (typeof userData === 'string') {
-      const user = JSON.parse(userData)
-
-      dispatch(authorize())
-      dispatch(setProfile(user))
+    return () => {
+      socket.off('connect', onConnect)
+      socket.off('connected', onConnected)
     }
   }, [])
+
 
   if (!authorized) {
     return <Navigate to='/auth' />

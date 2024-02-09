@@ -16,6 +16,9 @@ export const socketHandler = {
   onConnect: (socket: socketType) => {
     console.log(socket.id, ' - CONNECTED')
   },
+  onConnected: (userId: string) => {
+    io.emit('connected', userId)
+  },
   onDisconnect: (socket: socketType) => {
     console.log(socket.id, ' - DISCONNECTED')
   },
@@ -23,7 +26,10 @@ export const socketHandler = {
     socket.join(roomId)
 
     io.to(roomId).emit('joined', socket.id, roomId)
+  },
+  onLeave: (socket: socketType, roomId: string) => {
+    io.to(roomId).emit('left', socket.id, roomId)
 
-    console.log('Socket: ', socket.id, ' joined room: ', roomId)
+    socket.leave(roomId)
   }
 }
