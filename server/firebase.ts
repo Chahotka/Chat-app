@@ -1,7 +1,8 @@
 import { initializeApp, cert, ServiceAccount } from 'firebase-admin/app'
-import { DocumentData, getFirestore } from 'firebase-admin/firestore'
+import { DocumentData, FieldValue, getFirestore } from 'firebase-admin/firestore'
 import serviceKey from './serviceKey.json'
 import { User } from './interfaces/User'
+import { Message } from './interfaces/Message'
 
 const serviceAccount = serviceKey as ServiceAccount
 
@@ -93,6 +94,28 @@ export const dbHandler = {
     }
 
     return rooms
+  },
+  sendMessage: async (messageObject: Message) => {
+    const roomRef = db.collection('rooms_messages').doc(messageObject.roomId)
+    const unionRes = await roomRef.update({
+      messages: FieldValue.arrayUnion(messageObject)
+    })
+
+    console.log(unionRes)
+  },
+  getMessages: async (roomId: string) => {
+    const roomRef = db.collection('rooms_messages').doc(roomId)
+    const doc = await roomRef.get()
+
+    if (!doc.exists) {
+      return []
+    } 
+    
+    const data = doc.data()
+
+    if (typeof data !== 'undefined') {
+      return data.messages
+    }
   }
 }
 

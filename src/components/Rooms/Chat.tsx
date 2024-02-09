@@ -1,31 +1,32 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import cl from '../../styles/chat.module.css'
-import { useAppSelector } from '../../app/hooks'
 import MessageSender from './Chat/MessageSender'
 import Messages from './Chat/Messages'
 import { Message } from '../../interfaces/Message'
+import { socket } from '../../socket/socket'
 
 
 
 const Chat: React.FC = () => {
-  const room = useAppSelector(state => state.user.activeRoom)
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      messageId: 'fadf-adfasf-afd',
-      messageType: 'text',
-      textOrPath: 'TextorPatch',
-      roomId: '130901233',
-      userId: 'asdf-adfs-',
-      userName:'aeav',
-      createdAt: 128318911,
-      updatedAt: null
+  const bottomRef = useRef<HTMLLIElement>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+
+  const onMessages = (messages: Message[]) => {
+    setMessages(messages)
+  }
+
+  useEffect(() => {
+    socket.on('received messages', onMessages)
+
+    return () => {
+      socket.off('received messages', onMessages)
     }
-  ])
+  }, [])
 
   return (
     <div className={cl.chat}>
-      <Messages messages={messages} />
-      <MessageSender setMessages={setMessages} />
+      <Messages bottomRef={bottomRef} messages={messages} />
+      <MessageSender bottomRef={bottomRef} setMessages={setMessages} />
     </div>
   )
 }

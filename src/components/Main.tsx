@@ -18,7 +18,9 @@ const Main: React.FC = () => {
     socket.emit('connected', user.id)
   }
   const onConnected = (userId: string) => {
-    console.log('Socket ID: ', socket.id)
+    if (user.id === userId) {
+      console.log('Socket ID: ', socket.id)
+    }
   }
 
   useEffect(() => {

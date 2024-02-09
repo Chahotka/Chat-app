@@ -2,6 +2,8 @@ import { createServer } from 'http'
 import { Server, Socket } from 'socket.io'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 import { app } from './index'
+import { Message } from './interfaces/Message'
+import { dbHandler } from './firebase'
 
 type socketType = Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 
@@ -22,14 +24,22 @@ export const socketHandler = {
   onDisconnect: (socket: socketType) => {
     console.log(socket.id, ' - DISCONNECTED')
   },
-  onJoin: (socket: socketType, roomId: string) => {
+  onJoin: async (socket: socketType, roomId: string) => {
     socket.join(roomId)
 
+    const messages = await dbHandler.getMessages(roomId)
+    console.log(messages)
+
     io.to(roomId).emit('joined', socket.id, roomId)
+    io.to(roomId).emit('received messages', messages)
   },
   onLeave: (socket: socketType, roomId: string) => {
     io.to(roomId).emit('left', socket.id, roomId)
 
     socket.leave(roomId)
+  },
+  onSendMessage: async (socket: socketType, messageObject: Message) => {
+    await dbHandler.sendMessage(messageObject)
+    io.to(messageObject.roomId).emit('message sended', messageObject)
   }
 }

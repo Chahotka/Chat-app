@@ -4,13 +4,15 @@ import sendImg from '../../../images/send.svg'
 import { useAppSelector } from "../../../app/hooks"
 import { Message } from "../../../interfaces/Message"
 import { v4 } from "uuid"
+import { socket } from "../../../socket/socket"
 
 
 interface Props {
+  bottomRef: React.RefObject<HTMLLIElement>
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
 }
 
-const MessageSender: React.FC<Props> = ({ setMessages }) => {
+const MessageSender: React.FC<Props> = ({ bottomRef, setMessages }) => {
   const user = useAppSelector(state => state.user)
   const textarea = useRef<HTMLTextAreaElement>(null)
   const [message, setMessage] = useState('')
@@ -40,7 +42,16 @@ const MessageSender: React.FC<Props> = ({ setMessages }) => {
     }
 
     setMessage('')
+    socket.emit('send message', messageObject)
+  }
+
+  const onMessage = (messageObject: Message) => {
     setMessages(prev => [...prev, messageObject])
+
+    if (bottomRef.current) {
+      console.log('eba')
+      bottomRef.current.scrollIntoView()
+    }
   }
 
   useEffect(() => {
@@ -49,6 +60,14 @@ const MessageSender: React.FC<Props> = ({ setMessages }) => {
       textarea.current.style.height = scrollHeight + 'px'
     }
   }, [message])
+
+  useEffect(() => {
+    socket.on('message sended', onMessage)
+
+    return () => {
+      socket.on('message sended', onMessage)
+    }
+  }, [])
 
   return (
     <div className={cl.sender}>

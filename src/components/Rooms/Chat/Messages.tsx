@@ -4,10 +4,11 @@ import { Message } from '../../../interfaces/Message'
 import { useAppSelector } from '../../../app/hooks'
 
 interface Props {
+  bottomRef: React.Ref<HTMLLIElement>
   messages: Message[]
 }
 
-const Messages: React.FC<Props> = ({messages}) => {
+const Messages: React.FC<Props> = ({ bottomRef, messages }) => {
   const user = useAppSelector(state => state.user)
 
   return (
@@ -31,7 +32,8 @@ const Messages: React.FC<Props> = ({messages}) => {
             </li>
             )
         })}
-    </ul>
+        <li className={cl.bottom} ref={bottomRef}></li>
+      </ul>
     </div>
   )
 }
