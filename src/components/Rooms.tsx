@@ -5,6 +5,7 @@ import Sidebar from './Rooms/Sidebar'
 import { useFilter } from './hooks/useFilter'
 import AddRoom from './Rooms/AddRoom'
 import { useRooms } from './hooks/useRooms'
+import { useEscape } from './hooks/useEscape'
 
 interface Props {
   width: number
@@ -15,6 +16,7 @@ const Rooms: React.FC<Props> = ({ width, setActive }) => {
   const [name, setName] = useState('')
   const { rooms } = useRooms()
   const { filteredRooms } = useFilter(name, rooms)
+  const { sidebarActive, setSidebarActive } = useEscape()
 
   return (
     <div className={cl.rooms}>
@@ -23,7 +25,12 @@ const Rooms: React.FC<Props> = ({ width, setActive }) => {
         style={{left: width}}
         onMouseDown={() => setActive(true)}
       ></div>
-      <Sidebar name={name} setName={setName} />
+      <Sidebar 
+        active={sidebarActive} 
+        setActive={setSidebarActive} 
+        name={name} 
+        setName={setName}
+      />
       <AddRoom />
       { rooms.length > 0 &&
         <ul className={cl.roomsList}>

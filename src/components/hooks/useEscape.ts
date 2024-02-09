@@ -1,23 +1,32 @@
-import { useState } from "react"
-import { useAppDispatch } from "../../app/hooks"
+import { useEffect, useState } from "react"
+import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { setActiveRoom } from "../../features/user/UserSlice"
 
 export const useEscape = () => {
   const dispatch = useAppDispatch()
   const [sidebarActive, setSidebarActive] = useState(false)
+  const activeRoom = useAppSelector(state => state.user.activeRoom)
 
   const onEscape = (e: KeyboardEvent) => {
-    if (e.code !== 'Escape') {
+    if (e.key !== 'Escape') {
       return
     }
 
     if (sidebarActive) {
       setSidebarActive(false)
-      return
+    } else {
+      dispatch(setActiveRoom(null))
     }
-
-    dispatch(setActiveRoom(null))
   }
 
-  return {sidebarActive, setSidebarActive, onEscape}
+  useEffect(() => {
+    window.addEventListener('keydown', onEscape)
+
+    return () => {
+      window.removeEventListener('keydown', onEscape)
+
+    }
+  }, [sidebarActive, activeRoom])
+
+  return { sidebarActive, setSidebarActive }
 }
