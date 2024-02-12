@@ -13,12 +13,16 @@ interface Props {
 
 const MessageSender: React.FC<Props> = ({ setMessages }) => {
   const user = useAppSelector(state => state.user)
-  const textarea = useRef<HTMLTextAreaElement>(null)
   const [message, setMessage] = useState('')
 
-  const textAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const areaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value)
+
+    e.target.style.height = '29px'
+    const scHeight = e.target.scrollHeight
+    e.target.style.height = `${scHeight}px`
   }
+
 
   const onSend = () => {
     if (!user.activeRoom) {
@@ -40,20 +44,15 @@ const MessageSender: React.FC<Props> = ({ setMessages }) => {
       updatedAt: null
     }
 
+
     setMessage('')
     socket.emit('send message', messageObject)
   }
 
   const onMessage = (messageObject: Message) => {
     setMessages(prev => [...prev, messageObject])
-
   }
-  useEffect(() => {
-    if (textarea && textarea.current) {
-      const scrollHeight = textarea.current.scrollHeight
-      textarea.current.style.height = scrollHeight + 'px'
-    } 
-  }, [message])
+
 
   useEffect(() => {
     socket.on('message sended', onMessage)
@@ -65,12 +64,13 @@ const MessageSender: React.FC<Props> = ({ setMessages }) => {
 
 
   return (
-    <div className={cl.sender}>
+    <div 
+      className={cl.sender}
+    >
       <textarea 
-        ref={textarea}
         value={message}
-        className={cl.input}
-        onChange={(e) => textAreaChange(e)}
+        className={cl.textarea}
+        onChange={(e) => areaChange(e)}
         placeholder="Send message..."
       ></textarea>
       <img 

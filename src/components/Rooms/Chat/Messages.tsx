@@ -12,11 +12,11 @@ const Messages: React.FC<Props> = ({  messages }) => {
   const bottomRef = useRef<HTMLLIElement>(null)
 
   useEffect(() => {
+
     if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({behavior: 'smooth'})
+      bottomRef.current.scrollIntoView({behavior: 'auto'})
     }
   }, [messages])
-  
   
   return (
     <div className={cl.container}>
@@ -36,8 +36,8 @@ const Messages: React.FC<Props> = ({  messages }) => {
               key={message.messageId}
               className={owner ? [cl.message, cl.owner].join(' ') : cl.message}
             >
-              {message.textOrPath}
-              {`${dateObj.hh}:${dateObj.mm}`}
+              <p className={cl.messageText}>{message.textOrPath}</p>
+              <p className={cl.messageTime}>{`${dateObj.hh}:${dateObj.mm}`}</p>
             </li>
             )
         })}
