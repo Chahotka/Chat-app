@@ -113,7 +113,9 @@ export const dbHandler = {
     
     const data = doc.data()
 
-    if (typeof data !== 'undefined') {
+    if (!data || !data.messages) {
+      return []
+    } else {
       return data.messages
     }
   }

@@ -28,7 +28,6 @@ export const socketHandler = {
     socket.join(roomId)
 
     const messages = await dbHandler.getMessages(roomId)
-    console.log(messages)
 
     io.to(roomId).emit('joined', socket.id, roomId)
     io.to(roomId).emit('received messages', messages, socket.id)
