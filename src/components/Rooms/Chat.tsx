@@ -8,11 +8,12 @@ import { socket } from '../../socket/socket'
 
 
 const Chat: React.FC = () => {
-  const bottomRef = useRef<HTMLLIElement>(null)
   const [messages, setMessages] = useState<Message[]>([])
 
-  const onMessages = (messages: Message[]) => {
-    setMessages(messages)
+  const onMessages = (messages: Message[], joinedSocketId: string) => {
+    if (socket.id === joinedSocketId) {
+      setMessages(messages)
+    }
   }
 
   useEffect(() => {
@@ -25,8 +26,8 @@ const Chat: React.FC = () => {
 
   return (
     <div className={cl.chat}>
-      <Messages bottomRef={bottomRef} messages={messages} />
-      <MessageSender bottomRef={bottomRef} setMessages={setMessages} />
+      <Messages  messages={messages} />
+      <MessageSender setMessages={setMessages} />
     </div>
   )
 }

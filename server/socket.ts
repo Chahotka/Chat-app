@@ -31,7 +31,7 @@ export const socketHandler = {
     console.log(messages)
 
     io.to(roomId).emit('joined', socket.id, roomId)
-    io.to(roomId).emit('received messages', messages)
+    io.to(roomId).emit('received messages', messages, socket.id)
   },
   onLeave: (socket: socketType, roomId: string) => {
     io.to(roomId).emit('left', socket.id, roomId)

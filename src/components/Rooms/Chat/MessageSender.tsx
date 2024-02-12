@@ -8,11 +8,10 @@ import { socket } from "../../../socket/socket"
 
 
 interface Props {
-  bottomRef: React.RefObject<HTMLLIElement>
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>
 }
 
-const MessageSender: React.FC<Props> = ({ bottomRef, setMessages }) => {
+const MessageSender: React.FC<Props> = ({ setMessages }) => {
   const user = useAppSelector(state => state.user)
   const textarea = useRef<HTMLTextAreaElement>(null)
   const [message, setMessage] = useState('')
@@ -48,17 +47,12 @@ const MessageSender: React.FC<Props> = ({ bottomRef, setMessages }) => {
   const onMessage = (messageObject: Message) => {
     setMessages(prev => [...prev, messageObject])
 
-    if (bottomRef.current) {
-      console.log('eba')
-      bottomRef.current.scrollIntoView()
-    }
   }
-
   useEffect(() => {
     if (textarea && textarea.current) {
       const scrollHeight = textarea.current.scrollHeight
       textarea.current.style.height = scrollHeight + 'px'
-    }
+    } 
   }, [message])
 
   useEffect(() => {
@@ -68,6 +62,7 @@ const MessageSender: React.FC<Props> = ({ bottomRef, setMessages }) => {
       socket.on('message sended', onMessage)
     }
   }, [])
+
 
   return (
     <div className={cl.sender}>

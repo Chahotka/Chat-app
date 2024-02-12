@@ -1,19 +1,28 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import cl from '../../../styles/messages.module.css'
 import { Message } from '../../../interfaces/Message'
 import { useAppSelector } from '../../../app/hooks'
 
 interface Props {
-  bottomRef: React.Ref<HTMLLIElement>
   messages: Message[]
 }
 
-const Messages: React.FC<Props> = ({ bottomRef, messages }) => {
+const Messages: React.FC<Props> = ({  messages }) => {
   const user = useAppSelector(state => state.user)
+  const bottomRef = useRef<HTMLLIElement>(null)
 
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({behavior: 'smooth'})
+    }
+  }, [messages])
+  
+  
   return (
     <div className={cl.container}>
-      <ul className={cl.messages}>
+      <ul 
+        className={cl.messages}
+      >
         {messages.map(message => {
           const owner = message.userId === user.id
           const date = new Date(message.createdAt)
