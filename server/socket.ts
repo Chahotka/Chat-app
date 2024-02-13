@@ -17,20 +17,21 @@ export const io = new Server(httpServer, {
 export const socketHandler = {
   onConnect: (socket: socketType) => {
     console.log(socket.id, ' - CONNECTED')
-  },
-  onConnected: (userId: string) => {
-    io.emit('connected', userId)
+    socket.emit('connected', socket.id)
   },
   onDisconnect: (socket: socketType) => {
     console.log(socket.id, ' - DISCONNECTED')
   },
-  onJoin: async (socket: socketType, roomId: string) => {
-    socket.join(roomId)
-
+  onJoin: (socket: socketType, roomIds: string[]) => {
+    for (const roomId of roomIds) {
+      socket.join(roomId)
+      io.to(roomId).emit('joined', socket.id, roomId)
+    }
+  },
+  onGetMessages: async (socket: socketType, roomId: string) => {
     const messages = await dbHandler.getMessages(roomId)
 
-    io.to(roomId).emit('joined', socket.id, roomId)
-    io.to(roomId).emit('received messages', messages, socket.id)
+    io.to(roomId).emit('messages history', messages, roomId, socket.id)
   },
   onLeave: (socket: socketType, roomId: string) => {
     io.to(roomId).emit('left', socket.id, roomId)

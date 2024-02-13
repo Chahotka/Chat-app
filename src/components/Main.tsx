@@ -7,21 +7,32 @@ import { setProfile } from '../features/user/UserSlice'
 import { authorize } from '../features/auth/AuthSlice'
 import { useResizer } from './hooks/useResizer'
 import { socket } from '../socket/socket'
+import { Message } from '../interfaces/Message'
 
 const Main: React.FC = () => {
   const dispatch = useAppDispatch()
-  const user = useAppSelector(state => state.user)
+  const rooms = useAppSelector(state => state.user.rooms)
   const authorized = useAppSelector(state => state.auth.authorized)
   const { resizing, setResizing, roomsWidth, grid, onMove } = useResizer()
 
-  const onConnect = () => {
-    socket.emit('connected', user.id)
-  }
-  const onConnected = (userId: string) => {
-    if (user.id === userId) {
-      console.log('Socket ID: ', socket.id)
+  const onConnected = (socketId: string) => {
+    if (socket.id === socketId) {
+      const roomIds = rooms.map(room => room.roomId)
+
+      socket.emit('join rooms', roomIds)
     }
   }
+  const onJoined = (socketId: string, roomId: string) => {
+    if (socket.id === socketId) {
+      socket.emit('get messages', roomId)
+    }
+  }
+  const onMessagesHistory = (messages: Message[], roomId: string, socketId: string) => {
+    if (socket.id === socketId) {
+      sessionStorage.setItem(roomId, JSON.stringify(messages))
+    }
+  }
+
 
   useEffect(() => {
     if (!socket.connected) {
@@ -37,12 +48,14 @@ const Main: React.FC = () => {
       }
     }
 
-    socket.on('connect', onConnect)
     socket.on('connected', onConnected)
+    socket.on('joined', onJoined)
+    socket.on('messages history', onMessagesHistory)
 
     return () => {
-      socket.off('connect', onConnect)
       socket.off('connected', onConnected)
+      socket.off('joined', onJoined)
+      socket.off('messages history', onMessagesHistory)
     }
   }, [])
 

@@ -1,26 +1,25 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import cl from '../../styles/chat.module.css'
 import MessageSender from './Chat/MessageSender'
 import Messages from './Chat/Messages'
 import { Message } from '../../interfaces/Message'
-import { socket } from '../../socket/socket'
+import { useAppSelector } from '../../app/hooks'
 
 
 
 const Chat: React.FC = () => {
+  const activeRoom = useAppSelector(state => state.user.activeRoom)
   const [messages, setMessages] = useState<Message[]>([])
 
-  const onMessages = (messages: Message[], joinedSocketId: string) => {
-    if (socket.id === joinedSocketId) {
-      setMessages(messages)
-    }
-  }
-
   useEffect(() => {
-    socket.on('received messages', onMessages)
+    if (activeRoom) {
+      const storedMessages = sessionStorage.getItem(activeRoom.roomId)
 
-    return () => {
-      socket.off('received messages', onMessages)
+      if (typeof storedMessages === 'string') {
+        const messages = JSON.parse(storedMessages)
+
+        setMessages(messages)
+      }
     }
   }, [])
 
