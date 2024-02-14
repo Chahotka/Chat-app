@@ -11,23 +11,20 @@ import { Message } from '../interfaces/Message'
 
 const Main: React.FC = () => {
   const dispatch = useAppDispatch()
-  const rooms = useAppSelector(state => state.user.rooms)
+  const user = useAppSelector(state => state.user)
   const authorized = useAppSelector(state => state.auth.authorized)
   const { resizing, setResizing, roomsWidth, grid, onMove } = useResizer()
 
-  const onConnected = (socketId: string) => {
-    if (socket.id === socketId) {
-      const roomIds = rooms.map(room => room.roomId)
 
-      socket.emit('join rooms', roomIds)
-    }
-  }
   const onJoined = (socketId: string, roomId: string) => {
+    console.log('Getting messages')
     if (socket.id === socketId) {
       socket.emit('get messages', roomId)
     }
   }
+
   const onMessagesHistory = (messages: Message[], roomId: string, socketId: string) => {
+    console.log('MEssages received')
     if (socket.id === socketId) {
       sessionStorage.setItem(roomId, JSON.stringify(messages))
     }
@@ -48,16 +45,22 @@ const Main: React.FC = () => {
       }
     }
 
-    socket.on('connected', onConnected)
     socket.on('joined', onJoined)
     socket.on('messages history', onMessagesHistory)
 
     return () => {
-      socket.off('connected', onConnected)
       socket.off('joined', onJoined)
       socket.off('messages history', onMessagesHistory)
     }
   }, [])
+
+  useEffect(() => {
+    if (user.rooms.length > 0) {
+      const roomIds = user.rooms.map(room => room.roomId)
+
+      socket.emit('join rooms', roomIds)
+    }
+  }, [user])
 
 
   if (!authorized) {
