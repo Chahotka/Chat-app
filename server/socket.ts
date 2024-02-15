@@ -31,6 +31,7 @@ export const socketHandler = {
   onGetMessages: async (socket: socketType, roomId: string) => {
     const messages = await dbHandler.getMessages(roomId)
 
+    io.to(roomId).emit('last message', messages, roomId, socket.id)
     io.to(roomId).emit('messages history', messages, roomId, socket.id)
   },
   onLeave: (socket: socketType, roomId: string) => {

@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react"
-import { Message } from "../../interfaces/Message"
-
 interface DateObj {
   hh: string | number
   mm: string | number
@@ -11,6 +8,18 @@ interface DateObj {
 
 export const useDateConverter = () => {
   const dateConverter = (timestamp: number) => {
+    if (typeof timestamp === 'undefined') {
+      const dateObj: DateObj = {
+        hh: '',
+        mm: '',
+        ss: '',
+        day: '',
+        curDay: ''
+      }
+
+      return dateObj
+    }
+
     const date = new Date(timestamp)
     const currentDate = new Date(Date.now())
 

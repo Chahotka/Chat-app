@@ -17,14 +17,12 @@ const Main: React.FC = () => {
 
 
   const onJoined = (socketId: string, roomId: string) => {
-    console.log('Getting messages')
     if (socket.id === socketId) {
       socket.emit('get messages', roomId)
     }
   }
 
   const onMessagesHistory = (messages: Message[], roomId: string, socketId: string) => {
-    console.log('MEssages received')
     if (socket.id === socketId) {
       sessionStorage.setItem(roomId, JSON.stringify(messages))
     }

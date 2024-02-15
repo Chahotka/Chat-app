@@ -1,65 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import cl from '../../styles/rooms-list.module.css'
 import { RoomUser } from '../../interfaces/RoomUser'
 import { NavLink } from 'react-router-dom'
 import defImage from './Mogged.png'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { setActiveRoom } from '../../features/user/UserSlice'
-import { Message } from '../../interfaces/Message'
-import { useDateConverter } from '../hooks/useDateConverter'
+import { useLastMessage } from '../hooks/useLastMessage'
 
 interface Props {
   room: RoomUser
 }
 
-interface LastMessage {
-  userId: string
-  message: string
-  time: string
-}
-
 const RoomsList: React.FC<Props> = ({ room }) => {
   const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.user)
-  const [lastMessage, setLastMessage] = useState<LastMessage>({
-    userId: '',
-    message: '',
-    time: ''
-  })
-  const { dateConverter } = useDateConverter()
-
-  useEffect(() => {
-    const storedMessages = sessionStorage.getItem(room.roomId)
-
-    if (typeof storedMessages === 'string') {
-      const parsedMessages: Message[] = JSON.parse(storedMessages)
-
-      if (parsedMessages.length === 0) {
-        setLastMessage({
-          time: '',
-          userId: '',
-          message: 'Send your first message'
-        })
-      } else {
-        const lastMessage = parsedMessages[parsedMessages.length - 1]
-        const dateObj = dateConverter(lastMessage.createdAt)
-  
-        let time = ''
-  
-        if (dateObj.day !== dateObj.curDay) {
-          time = dateObj.day
-        } else {
-          time = `${dateObj.hh}:${dateObj.mm}`
-        }
-        
-        setLastMessage({
-          userId: lastMessage.userId, 
-          message: lastMessage.textOrPath,
-          time
-        })
-      }
-    }
-  }, [])
+  const { lastMessage } = useLastMessage(room)
 
   return (
     <li onClick={() => dispatch(setActiveRoom(room))} className={cl.room}>
