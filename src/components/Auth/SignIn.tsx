@@ -2,26 +2,25 @@ import React, { useEffect, useState } from 'react'
 import cl from '../../styles/sign.module.css'
 import { useSignIn } from '../hooks/useSignIn'
 import Loader from '../UI/Loader/Loader'
-import { useAppSelector } from '../../app/hooks'
 import { useNavigate } from 'react-router-dom'
 import Input from '../UI/Input/Input'
 import Button from '../UI/Button/Button'
 import Message from '../UI/Message/Message'
-import { useValidate } from '../hooks/useValidate'
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate()
-  const isAuth = useAppSelector(state => state.auth.authorized)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
   const { signIn, loading } = useSignIn(email, password, setMessage)
 
   useEffect(() => {
-    if (isAuth) {
+    const storedUser = sessionStorage.getItem('user')
+
+    if (typeof storedUser === 'string') {
       navigate('/')
     }
-  }, [])
+  }, [signIn])
 
   useEffect(() => {
     setMessage('')

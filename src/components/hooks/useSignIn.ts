@@ -1,18 +1,12 @@
 import React from 'react'
-import { useAppDispatch } from '../../app/hooks'
 import { useFetch } from './useFetch'
 import { useEmailExist } from './useEmailExist'
-import { setProfile } from '../../features/user/UserSlice'
-import { authorize } from '../../features/auth/AuthSlice'
-import { useNavigate } from 'react-router-dom'
 
 export const useSignIn = (
   email: string,
   password: string,
   setMessage: React.Dispatch<React.SetStateAction<string>>
 ) => {
-  const dispatch = useAppDispatch()
-  const navigate = useNavigate()
   const checkEmail = useEmailExist(email)
   const fetchOptions = {
     method: 'POST',
@@ -35,11 +29,6 @@ export const useSignIn = (
 
     if (userData) {
       sessionStorage.setItem('user', JSON.stringify(userData))
-
-      dispatch(authorize())
-      dispatch(setProfile(userData))
-      
-      navigate('/')
     } else {
       setMessage('Email or password are wrong')
     }
