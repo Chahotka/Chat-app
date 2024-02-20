@@ -25,14 +25,14 @@ export const socketHandler = {
   onJoin: (socket: socketType, roomIds: string[]) => {
     for (const roomId of roomIds) {
       socket.join(roomId)
-      io.to(roomId).emit('joined', socket.id, roomId)
+      console.log(`SOCKET: ${socket.id} JOINED ROOM: ${roomId}`)
+      io.to(roomId).emit('joined', socket.id, roomId, roomIds)
     }
   },
   onGetMessages: async (socket: socketType, roomId: string) => {
     const messages = await dbHandler.getMessages(roomId)
-
-    io.to(roomId).emit('last message', messages, roomId, socket.id)
-    io.to(roomId).emit('messages history', messages, roomId, socket.id)
+    console.log('GETTING MESSAGES FOR: ', roomId)
+    io.to(socket.id).emit('messages history', messages, roomId, socket.id)
   },
   onLeave: (socket: socketType, roomId: string) => {
     io.to(roomId).emit('left', socket.id, roomId)
@@ -40,7 +40,5 @@ export const socketHandler = {
     socket.leave(roomId)
   },
   onSendMessage: async (socket: socketType, messageObject: Message) => {
-    await dbHandler.sendMessage(messageObject)
-    io.to(messageObject.roomId).emit('message sended', messageObject)
   }
 }

@@ -51,6 +51,13 @@ const MessageSender: React.FC<Props> = ({ setMessages }) => {
 
   const onMessage = (messageObject: Message) => {
     setMessages(prev => [...prev, messageObject])
+
+    const storageMessages = sessionStorage.getItem(messageObject.roomId)
+
+    if (typeof storageMessages === 'string') {
+      const parsedMessages = JSON.parse(storageMessages)
+      sessionStorage.setItem(messageObject.roomId, JSON.stringify([...parsedMessages, messageObject]))
+    }
   }
 
 

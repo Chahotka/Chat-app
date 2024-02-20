@@ -1,69 +1,49 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import cl from '../styles/main.module.css'
 import Rooms from './Rooms'
-import { Navigate, Outlet } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../app/hooks'
-import { setProfile } from '../features/user/UserSlice'
-import { authorize } from '../features/auth/AuthSlice'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { useAppDispatch } from '../app/hooks'
+import { UserState, setProfile } from '../features/user/UserSlice'
 import { useResizer } from './hooks/useResizer'
 import { socket } from '../socket/socket'
-import { Message } from '../interfaces/Message'
+import { useMessages } from './hooks/useMessages'
 
 const Main: React.FC = () => {
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
-  const user = useAppSelector(state => state.user)
-  const authorized = useAppSelector(state => state.auth.authorized)
+  const [active, setActive] = useState(socket.connected)
   const { resizing, setResizing, roomsWidth, grid, onMove } = useResizer()
 
-
-  const onJoined = (socketId: string, roomId: string) => {
-    if (socket.id === socketId) {
-      socket.emit('get messages', roomId)
-    }
-  }
-
-  const onMessagesHistory = (messages: Message[], roomId: string, socketId: string) => {
-    if (socket.id === socketId) {
-      sessionStorage.setItem(roomId, JSON.stringify(messages))
-    }
-  }
-
-
   useEffect(() => {
-    if (!socket.connected) {
-      socket.connect()
+    socket.connect()
+    
+    const storedUser = sessionStorage.getItem('user')
+    
+    if (typeof storedUser === 'string') {
+      const parsedUser: UserState = JSON.parse(storedUser)
   
-      const userData = sessionStorage.getItem('user')
-  
-      if (typeof userData === 'string') {
-        const user = JSON.parse(userData)
-  
-        dispatch(authorize())
-        dispatch(setProfile(user))
-      }
+      dispatch(setProfile(parsedUser))
+    } else {
+      navigate('/auth')
     }
 
-    socket.on('joined', onJoined)
-    socket.on('messages history', onMessagesHistory)
+    socket.on('connect', () => {
+      setActive(socket.connected)
+    })
+    socket.on('disconnect', () => {
+      setActive(socket.connected)
+    })
+    socket.on('connect_error', () => {
+      setActive(socket.connected)
+    })
 
     return () => {
-      socket.off('joined', onJoined)
-      socket.off('messages history', onMessagesHistory)
+      socket.off('connect')
+      socket.off('disconnect')
+      socket.off('connect_error')
     }
   }, [])
 
-  useEffect(() => {
-    if (user.rooms.length > 0) {
-      const roomIds = user.rooms.map(room => room.roomId)
-
-      socket.emit('join rooms', roomIds)
-    }
-  }, [user])
-
-
-  if (!authorized) {
-    return <Navigate to='/auth' />
-  }
 
   return (
     <div 
@@ -74,6 +54,20 @@ const Main: React.FC = () => {
       onMouseUp={() => setResizing(false)}
       onMouseMove={(e) => onMove(e)}
     >
+      <div className={cl.statusDiv}>
+        <span className={cl.socketId}>
+          {socket.id 
+            ? `ID: ${socket.id}`
+            : 'socket_offline'
+          }
+        </span>
+        <span 
+          className={ active 
+            ? [cl.status, cl.active].join(' ')
+            : cl.status
+          }
+        ></span>
+      </div>
       <Rooms width={roomsWidth} setActive={setResizing}/>
       <Outlet />
     </div>

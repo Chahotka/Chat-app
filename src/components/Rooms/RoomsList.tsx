@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom'
 import defImage from './Mogged.png'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { setActiveRoom } from '../../features/user/UserSlice'
-import { useLastMessage } from '../hooks/useLastMessage'
+import { useMessages } from '../hooks/useMessages'
 
 interface Props {
   room: RoomUser
@@ -14,7 +14,7 @@ interface Props {
 const RoomsList: React.FC<Props> = ({ room }) => {
   const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.user)
-  const { lastMessage } = useLastMessage(room)
+  const { lastMessage } = useMessages(room)
 
   return (
     <li onClick={() => dispatch(setActiveRoom(room))} className={cl.room}>
@@ -24,7 +24,7 @@ const RoomsList: React.FC<Props> = ({ room }) => {
         </div>
         <div className={cl.info}>
           <div className={cl.userInfo}>
-            <p className={cl.name}>{ room.name }</p>
+            <p className={cl.name}>{room.name}</p>
             <p className={cl.time}>
               {lastMessage.time}
             </p>

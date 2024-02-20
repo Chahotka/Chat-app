@@ -112,8 +112,7 @@ export const dbHandler = {
     } 
     
     const data = doc.data()
-
-    if (!data || !data.messages) {
+    if (!data || !data.messages || data.messages.length === 0) {
       return []
     } else {
       return data.messages

@@ -1,27 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import cl from '../../styles/chat.module.css'
 import MessageSender from './Chat/MessageSender'
 import Messages from './Chat/Messages'
-import { Message } from '../../interfaces/Message'
 import { useAppSelector } from '../../app/hooks'
+import { useMessages } from '../hooks/useMessages'
 
 
 
 const Chat: React.FC = () => {
   const activeRoom = useAppSelector(state => state.user.activeRoom)
-  const [messages, setMessages] = useState<Message[]>([])
+  const { messages, setMessages } = useMessages(activeRoom)
 
-  useEffect(() => {
-    if (activeRoom) {
-      const storedMessages = sessionStorage.getItem(activeRoom.roomId)
-
-      if (typeof storedMessages === 'string') {
-        const messages = JSON.parse(storedMessages)
-
-        setMessages(messages)
-      }
-    }
-  }, [])
 
   return (
     <div className={cl.chat}>

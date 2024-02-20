@@ -3,19 +3,20 @@ import { useFetch } from "./useFetch"
 import { RoomUser } from "../../interfaces/RoomUser"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { addRooms } from "../../features/user/UserSlice"
+import { socket } from "../../socket/socket"
+import { Message } from "../../interfaces/Message"
 
 export const useRooms = () => {
   const dispatch = useAppDispatch()
-  const userRooms = useAppSelector(state => state.user.rooms)
+  const user = useAppSelector(state => state.user)
   const [rooms, setRooms] = useState<RoomUser[]>([])
   const [error, setError] = useState('')
-
-  const { loading, fetching } = useFetch(async() => {
+  const { loading, fetching } = useFetch(async () => {
     const storageUser = sessionStorage.getItem('user')
 
     if (typeof storageUser === 'string') {
       const parsedUser = JSON.parse(storageUser)
-      
+
       const response = await fetch('http://localhost:5000/get-rooms', {
         method: 'POST',
         headers: {
@@ -24,7 +25,7 @@ export const useRooms = () => {
         body: JSON.stringify(parsedUser.rooms)
       })
 
-      const data = await response.json()
+      const data: RoomUser[] = await response.json()
 
       setRooms(data)
       dispatch(addRooms(data))
@@ -49,15 +50,32 @@ export const useRooms = () => {
     }
   }
 
+  const joinRooms = () => {
+    const storedUser = sessionStorage.getItem('user')
+
+    if (typeof storedUser === 'string' && JSON.parse(storedUser).rooms.length > 0) {
+      const parsedRooms: RoomUser[] = JSON.parse(storedUser).rooms
+      const roomIds = parsedRooms.map(room => room.roomId)
+
+      socket.emit('join rooms', roomIds)
+    }
+  }
+
   useEffect(() => {
     updateRooms()
+
+    socket.on('connected', joinRooms)
+
+    return () => {
+      socket.off('connected')
+    }
   }, [])
 
   useEffect(() => {
-    if (userRooms.length > 0) {
-      setRooms(userRooms)
+    if (user.rooms.length > 0) {
+      setRooms(user.rooms)
     }
-  }, [userRooms])
+  }, [user.rooms])
 
   return { rooms, loading, setRooms }
 }

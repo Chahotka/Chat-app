@@ -4,7 +4,7 @@ import dotenv from 'dotenv/config'
 import cors from 'cors'
 import { v4 } from 'uuid'
 import { dbHandler } from './firebase'
-import {io, httpServer, socketHandler } from './socket'
+import { io, httpServer, socketHandler } from './socket'
 import { hashPassword } from './hashPassword'
 import { Sign } from './interfaces/Sign'
 import { DocumentData } from 'firebase-admin/firestore'
@@ -14,7 +14,7 @@ export const app = express()
 
 app.use(cors())
 app.use(bp.json())
-app.use(bp.urlencoded({extended: true}))
+app.use(bp.urlencoded({ extended: true }))
 
 
 app.post('/check-exist', async (req: Request, res: Response) => {
@@ -31,7 +31,7 @@ app.post('/check-exist', async (req: Request, res: Response) => {
 app.post('/sign-up', async (req: Request, res: Response) => {
   const data: Sign = req.body
   const email = data.email.toLowerCase()
-  const { hash, salt } =  hashPassword(data.password)
+  const { hash, salt } = hashPassword(data.password)
 
   await dbHandler.addUser({
     id: v4(),
@@ -65,10 +65,10 @@ app.post('/sign-in', async (req: Request, res: Response) => {
   }
 })
 
-app.post('/add-user', async (req: Request, res:Response) => {
+app.post('/add-user', async (req: Request, res: Response) => {
   const userNameOrId = req.body.searchText.toLowerCase()
   const searchBy = req.body.searchBy
-  const userResponse = await dbHandler.searchUser(userNameOrId, searchBy) 
+  const userResponse = await dbHandler.searchUser(userNameOrId, searchBy)
 
   if (typeof userResponse.res === 'object') {
     const roomId = v4()
@@ -83,15 +83,15 @@ app.post('/add-user', async (req: Request, res:Response) => {
 
     await dbHandler.addRoom(req.body.creator, userResponse.res.id, roomId)
 
-    res.send({...userResponse, res: userData})
+    res.send({ ...userResponse, res: userData })
   } else {
     res.send(userResponse)
   }
 
-  
+
 })
 
-app.post('/get-rooms', async (req: Request, res:Response) => {
+app.post('/get-rooms', async (req: Request, res: Response) => {
   const usersList = await dbHandler.getRooms(req.body)
   const rooms: DocumentData[] = []
 
@@ -119,12 +119,12 @@ io.on('connect', (socket) => {
 
   socket.on('join rooms', (roomIds) => {
     socketHandler.onJoin(socket, roomIds)
-  })
+  })   
 
   socket.on('get messages', (roomId) => {
     socketHandler.onGetMessages(socket, roomId)
   })
-  
+
   socket.on('send message', (messageObject) => {
     socketHandler.onSendMessage(socket, messageObject)
   })
@@ -132,6 +132,19 @@ io.on('connect', (socket) => {
   socket.on('disconnect', () => 
     socketHandler.onDisconnect(socket)
   )
+  socket.on('connection_error', (err) => {
+    console.log(err.req)
+    console.log(err.code)
+    console.log(err.message)
+    console.log(err.context)
+  })
+})
+
+io.on('connection_error', (err) => {
+  console.log(err.req)
+  console.log(err.code)
+  console.log(err.message)
+  console.log(err.context)
 })
 
 httpServer.listen(5001)

@@ -9,3 +9,32 @@
   user-select: none;
   cursor: col-resize;
 }
+
+.statusDiv {
+  bottom: 10px;
+  left: 10px;
+  gap: 10px;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  z-index: 200;
+}
+
+.socketId {
+  opacity: 0.5;
+  font-size: 12px;
+}
+
+.status {
+  width: 10px;
+  height: 10px;
+  display: block;
+  background: red;
+  border-radius: 50%;
+  opacity: 1;
+}
+
+.status.active {
+  opacity: 1;
+  background: green;
+}
