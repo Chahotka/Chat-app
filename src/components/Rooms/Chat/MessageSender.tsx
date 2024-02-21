@@ -14,6 +14,7 @@ interface Props {
 const MessageSender: React.FC<Props> = ({ setMessages }) => {
   const user = useAppSelector(state => state.user)
   const [message, setMessage] = useState('')
+  const ref = useRef<HTMLTextAreaElement>(null)
 
   const areaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value)
@@ -23,27 +24,35 @@ const MessageSender: React.FC<Props> = ({ setMessages }) => {
     e.target.style.height = `${scHeight}px`
   }
 
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      onSend()
+    }
+  }
+
 
   const onSend = () => {
     if (!user.activeRoom) {
       return
-    } else if (!message) {
+    } else if (message.trim().length === 0) {
+      console.log('MESSAGE NOT SENT')
+      setMessage('')
       return
     }
 
-    const date =  Date.now()
+    const date = Date.now()
 
     const messageObject: Message = {
       messageId: v4(),
       messageType: 'text',
-      textOrPath: message,
+      textOrPath: message.trim(),
       roomId: user.activeRoom.roomId,
       userId: user.id,
       userName: user.name,
       createdAt: date,
       updatedAt: null
     }
-
 
     setMessage('')
     socket.emit('send message', messageObject)
@@ -69,22 +78,32 @@ const MessageSender: React.FC<Props> = ({ setMessages }) => {
     }
   }, [])
 
+  useEffect(() => {
+    if (message.trim().length === 0 && ref.current) {
+      ref.current.style.height = '29px'
+      const scHeight = ref.current.scrollHeight
+      ref.current.style.height = `${scHeight}px`
+    }
+  }, [message])
+
 
   return (
-    <div 
+    <div
       className={cl.sender}
     >
-      <textarea 
+      <textarea
+        ref={ref}
         value={message}
         className={cl.textarea}
         onChange={(e) => areaChange(e)}
+        onKeyDown={(e) => onKeyDown(e)}
         placeholder="Send message..."
       ></textarea>
-      <img 
-        className={cl.send} 
-        src={sendImg} 
+      <img
+        className={cl.send}
+        src={sendImg}
         onClick={onSend}
-        alt="send" 
+        alt="send"
       />
     </div>
 
