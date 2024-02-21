@@ -17,15 +17,12 @@ export const useMessages = (room: RoomUser | null) => {
   const [lastMessage, setLastMessage] = useState<LastMessage>({time: '', userId: '', message: ''})
   const { dateConverter } = useDateConverter()
 
-  const onHistory = (messages: Message[], roomId: string, socketId: string) => {
-    if (room && room.roomId === roomId && socket.id === socketId && messages.length > 0) {
-      console.log('HISTORY EVENT')
-      sessionStorage.setItem(roomId, JSON.stringify(messages))
-
+  const getLastMessage = (messages: Message[]) => {
+    if (messages.length > 0) {
       let time = ''
       const lastMessage = messages[messages.length - 1]
       const dateObj = dateConverter(lastMessage.createdAt)
-
+  
       if (dateObj.day === dateObj.curDay) {
         time = `${dateObj.hh}:${dateObj.mm}`
       } else {
@@ -37,13 +34,22 @@ export const useMessages = (room: RoomUser | null) => {
         userId: lastMessage.userId,
         message: lastMessage.textOrPath
       })
-    } else if (room && room.roomId === roomId && socket.id === socketId && messages.length === 0) {
-      setMessages(messages)
+    } else {
       setLastMessage({
         time: '',
         userId: '',
         message: 'no messages'
       })
+    }
+  }
+
+  const onHistory = (messages: Message[], roomId: string, socketId: string) => {
+    if (room && room.roomId === roomId && socket.id === socketId && messages.length > 0) {
+      getLastMessage(messages)
+      sessionStorage.setItem(roomId, JSON.stringify(messages))
+    } else if (room && room.roomId === roomId && socket.id === socketId && messages.length === 0) {
+      setMessages(messages)
+      getLastMessage(messages)
       sessionStorage.setItem(roomId, JSON.stringify(messages))
     }
   }
@@ -54,6 +60,10 @@ export const useMessages = (room: RoomUser | null) => {
 
       if (typeof storedMessages !== 'string') {
         socket.emit('get messages', room.roomId)
+      } else {
+        const parsedMessages = JSON.parse(storedMessages)
+
+        getLastMessage(parsedMessages)
       }
     }
   
