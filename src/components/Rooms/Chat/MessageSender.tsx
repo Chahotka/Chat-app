@@ -36,7 +36,6 @@ const MessageSender: React.FC<Props> = ({ setMessages }) => {
     if (!user.activeRoom) {
       return
     } else if (message.trim().length === 0) {
-      console.log('MESSAGE NOT SENT')
       setMessage('')
       return
     }
