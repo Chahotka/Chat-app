@@ -97,11 +97,9 @@ export const dbHandler = {
   },
   sendMessage: async (messageObject: Message) => {
     const roomRef = db.collection('rooms_messages').doc(messageObject.roomId)
-    const unionRes = await roomRef.update({
+    await roomRef.update({
       messages: FieldValue.arrayUnion(messageObject)
     })
-
-    console.log(unionRes)
   },
   getMessages: async (roomId: string) => {
     const roomRef = db.collection('rooms_messages').doc(roomId)

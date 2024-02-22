@@ -86,5 +86,5 @@ export const useMessages = (room: RoomUser | null) => {
     }
   }, [activeRoom])
 
-  return { messages, setMessages, lastMessage }
+  return { messages, setMessages, lastMessage, setLastMessage, getLastMessage }
 }

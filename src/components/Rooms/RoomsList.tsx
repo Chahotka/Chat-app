@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import cl from '../../styles/rooms-list.module.css'
 import { RoomUser } from '../../interfaces/RoomUser'
 import { NavLink } from 'react-router-dom'
@@ -6,6 +6,9 @@ import defImage from './Mogged.png'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { setActiveRoom } from '../../features/user/UserSlice'
 import { useMessages } from '../hooks/useMessages'
+import { Message } from '../../interfaces/Message'
+import { useDateConverter } from '../hooks/useDateConverter'
+import { socket } from '../../socket/socket'
 
 interface Props {
   room: RoomUser
@@ -14,7 +17,22 @@ interface Props {
 const RoomsList: React.FC<Props> = ({ room }) => {
   const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.user)
-  const { lastMessage } = useMessages(room)
+  const { messages, lastMessage, getLastMessage } = useMessages(room)
+  const { dateConverter } = useDateConverter()
+
+  const onMessage = (messageObj: Message) => {
+    if (room.roomId === messageObj.roomId) {
+      getLastMessage([messageObj])
+    }
+  }
+
+  useEffect(() => {
+    socket.on('message sended', onMessage)
+
+    return () => {
+      socket.off('message sended', onMessage)
+    }
+  }, [messages])
 
   return (
     <li onClick={() => dispatch(setActiveRoom(room))} className={cl.room}>

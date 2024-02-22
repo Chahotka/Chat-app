@@ -40,5 +40,7 @@ export const socketHandler = {
     socket.leave(roomId)
   },
   onSendMessage: async (socket: socketType, messageObject: Message) => {
+    io.to(messageObject.roomId).emit('message sended', messageObject)
+    await dbHandler.sendMessage(messageObject)
   }
 }

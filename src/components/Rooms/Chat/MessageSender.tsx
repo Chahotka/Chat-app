@@ -73,7 +73,7 @@ const MessageSender: React.FC<Props> = ({ setMessages }) => {
     socket.on('message sended', onMessage)
 
     return () => {
-      socket.on('message sended', onMessage)
+      socket.off('message sended', onMessage)
     }
   }, [])
 
