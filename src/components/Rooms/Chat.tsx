@@ -4,6 +4,7 @@ import MessageSender from './Chat/MessageSender'
 import Messages from './Chat/Messages'
 import { useAppSelector } from '../../app/hooks'
 import { useMessages } from '../hooks/useMessages'
+import ChatBar from './Chat/ChatBar'
 
 
 
@@ -14,6 +15,7 @@ const Chat: React.FC = () => {
 
   return (
     <div className={cl.chat}>
+      <ChatBar />
       <Messages  messages={messages} />
       <MessageSender setMessages={setMessages} />
     </div>

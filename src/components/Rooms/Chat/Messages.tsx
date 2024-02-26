@@ -12,7 +12,6 @@ const Messages: React.FC<Props> = ({  messages }) => {
   const bottomRef = useRef<HTMLLIElement>(null)
 
   useEffect(() => {
-
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({behavior: 'auto'})
     }
@@ -20,9 +19,7 @@ const Messages: React.FC<Props> = ({  messages }) => {
   
   return (
     <div className={cl.container}>
-      <ul 
-        className={cl.messages}
-      >
+      <ul className={cl.messages}>
         {messages.map(message => {
           const owner = message.userId === user.id
           const date = new Date(message.createdAt)
@@ -39,7 +36,7 @@ const Messages: React.FC<Props> = ({  messages }) => {
               <p className={cl.messageText}>{message.textOrPath}</p>
               <p className={cl.messageTime}>{`${dateObj.hh}:${dateObj.mm}`}</p>
             </li>
-            )
+          )
         })}
         <li className={cl.bottom} ref={bottomRef}></li>
       </ul>

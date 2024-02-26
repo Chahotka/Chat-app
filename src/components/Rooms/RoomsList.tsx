@@ -18,7 +18,6 @@ const RoomsList: React.FC<Props> = ({ room }) => {
   const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.user)
   const { messages, lastMessage, getLastMessage } = useMessages(room)
-  const { dateConverter } = useDateConverter()
 
   const onMessage = (messageObj: Message) => {
     if (room.roomId === messageObj.roomId) {
