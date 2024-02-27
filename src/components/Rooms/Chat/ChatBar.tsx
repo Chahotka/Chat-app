@@ -11,7 +11,7 @@ const ChatBar: React.FC = () => {
   return (
     <div className={cl.bar}>
       <p>{ room.name }</p>
-      <p>Last seen</p>
+      <p>Last seen: yesterday</p>
   </div>
   )
 }

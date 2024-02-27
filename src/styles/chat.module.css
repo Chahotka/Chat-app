@@ -1,7 +1,7 @@
 .chat {
+  height: 100vh;
+  max-height: 100vh;
+  min-height: 100vh;
   display: grid;
-  grid-template-rows: 1fr min-content;
-  background: #000;
-  position: relative;
-  overflow: hidden;
+  grid-template-rows: min-content 1fr min-content;
 }

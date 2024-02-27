@@ -7,4 +7,5 @@ export interface RoomUser {
   avatar: string
   roomId: string
   messages: Message[]
+  activityStatus: string | number
 }
