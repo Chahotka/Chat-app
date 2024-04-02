@@ -6,7 +6,6 @@ import { useAppDispatch } from '../app/hooks'
 import { UserState, setProfile } from '../features/user/UserSlice'
 import { useResizer } from './hooks/useResizer'
 import { socket } from '../socket/socket'
-import { useMessages } from './hooks/useMessages'
 
 const Main: React.FC = () => {
   const navigate = useNavigate()
@@ -16,12 +15,10 @@ const Main: React.FC = () => {
 
   useEffect(() => {
     socket.connect()
-    
     const storedUser = sessionStorage.getItem('user')
-    
+
     if (typeof storedUser === 'string') {
       const parsedUser: UserState = JSON.parse(storedUser)
-  
       dispatch(setProfile(parsedUser))
     } else {
       navigate('/auth')
@@ -44,9 +41,8 @@ const Main: React.FC = () => {
     }
   }, [])
 
-
   return (
-    <div 
+    <div
       className={resizing ? [cl.main, cl.resize].join(' ') : cl.main}
       style={{
         gridTemplateColumns: grid
@@ -56,19 +52,19 @@ const Main: React.FC = () => {
     >
       <div className={cl.statusDiv}>
         <span className={cl.socketId}>
-          {socket.id 
+          {socket.id
             ? `ID: ${socket.id}`
             : 'socket_offline'
           }
         </span>
-        <span 
-          className={ active 
+        <span
+          className={active
             ? [cl.status, cl.active].join(' ')
             : cl.status
           }
         ></span>
       </div>
-      <Rooms width={roomsWidth} setActive={setResizing}/>
+      <Rooms width={roomsWidth} setActive={setResizing} />
       <Outlet />
     </div>
   )

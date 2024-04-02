@@ -15,7 +15,7 @@ const Chat: React.FC = () => {
 
   return (
     <div className={cl.chat}>
-      <ChatBar />
+      { activeRoom && <ChatBar room={activeRoom} /> }
       <Messages  messages={messages} />
       <MessageSender setMessages={setMessages} />
     </div>

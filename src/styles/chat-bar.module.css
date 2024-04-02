@@ -1,7 +1,19 @@
 .bar {
   padding: 10px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
   background: #222;
+}
+.info {
+
+}
+
+.actions {
+
+}
+
+.call {
+  width: 20px;
+  cursor: pointer;
 }

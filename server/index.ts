@@ -8,6 +8,7 @@ import { io, httpServer, socketHandler } from './socket'
 import { hashPassword } from './hashPassword'
 import { Sign } from './interfaces/Sign'
 import { DocumentData } from 'firebase-admin/firestore'
+import { ACTIONS } from './modules/Actions'
 dotenv
 
 export const app = express()
@@ -27,7 +28,6 @@ app.post('/check-exist', async (req: Request, res: Response) => {
 
   res.send(exist)
 })
-
 app.post('/sign-up', async (req: Request, res: Response) => {
   const data: Sign = req.body
   const email = data.email.toLowerCase()
@@ -46,7 +46,6 @@ app.post('/sign-up', async (req: Request, res: Response) => {
 
   res.send(exist)
 })
-
 app.post('/sign-in', async (req: Request, res: Response) => {
   const data: Sign = req.body
   const response = await dbHandler.getUser(data.email.toLowerCase())
@@ -64,7 +63,6 @@ app.post('/sign-in', async (req: Request, res: Response) => {
     res.send(false)
   }
 })
-
 app.post('/add-user', async (req: Request, res: Response) => {
   const userNameOrId = req.body.searchText.toLowerCase()
   const searchBy = req.body.searchBy
@@ -90,7 +88,6 @@ app.post('/add-user', async (req: Request, res: Response) => {
 
 
 })
-
 app.post('/get-rooms', async (req: Request, res: Response) => {
   const usersList = await dbHandler.getRooms(req.body)
   const rooms: DocumentData[] = []
@@ -107,7 +104,6 @@ app.post('/get-rooms', async (req: Request, res: Response) => {
 
   res.send(rooms)
 })
-
 app.listen(5000, () => {
   console.log('Listen on port: ', 5000, ' blya')
 })
@@ -119,7 +115,7 @@ io.on('connect', (socket) => {
 
   socket.on('join rooms', (roomIds) => {
     socketHandler.onJoin(socket, roomIds)
-  })   
+  })
 
   socket.on('get messages', (roomId) => {
     socketHandler.onGetMessages(socket, roomId)
@@ -128,8 +124,40 @@ io.on('connect', (socket) => {
   socket.on('send message', (messageObject) => {
     socketHandler.onSendMessage(socket, messageObject)
   })
+  // ==================================
 
-  socket.on('disconnect', () => 
+  socket.on(ACTIONS.CALL, ({ roomId }) => {
+    const clients = io.sockets.adapter.rooms.get(roomId) || []
+
+    Array.from(clients).forEach(clientId => {
+      if (clientId !== socket.id) {
+        io.to(clientId).emit(ACTIONS.ADD_PEER, {
+          peerId: socket.id,
+          createOffer: false
+        })
+
+        socket.emit(ACTIONS.ADD_PEER, {
+          peerId: clientId,
+          createOffer: true
+        })
+      }
+    })
+  })
+  socket.on(ACTIONS.RELAY_ICE, ({ peerId, iceCandidate}) => {
+    io.to(peerId).emit(ACTIONS.ICE_CANDIDATE, {
+      peerId: socket.id,
+      iceCandidate
+    })
+  })
+  socket.on(ACTIONS.RELAY_SDP, ({ peerId, sessionDescription }) => {
+    io.to(peerId).emit(ACTIONS.SESSION_DESCRIPTION, {
+      peerId: socket.id,
+      sessionDescription
+    })
+  })
+
+  // ===========================
+  socket.on('disconnect', () =>
     socketHandler.onDisconnect(socket)
   )
   socket.on('connection_error', (err) => {
