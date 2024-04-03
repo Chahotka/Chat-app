@@ -14,6 +14,7 @@ const Main: React.FC = () => {
   const { resizing, setResizing, roomsWidth, grid, onMove } = useResizer()
 
   useEffect(() => {
+    console.log('main re-rendering')
     socket.connect()
     const storedUser = sessionStorage.getItem('user')
 

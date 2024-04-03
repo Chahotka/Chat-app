@@ -3,13 +3,25 @@ import callImg from '../../../images/phone.svg'
 import { RoomUser } from '../../../interfaces/RoomUser'
 import { useWebRTC } from '../../hooks/useWebRTC'
 import CallRoom from './Call/CallRoom'
+import { useEffect } from 'react'
 
 interface Props {
   room: RoomUser
 }
 
 const ChatBar: React.FC<Props> = ({ room }) => {
-  const { clients, call, callState, setCallState, provideMediaRef } = useWebRTC(room.roomId)
+  const { 
+    clients, 
+    call, 
+    stopCall,
+    callState, 
+    setCallState, 
+    provideMediaRef 
+  } = useWebRTC(room.roomId)
+
+  useEffect(() => {
+    console.log('chat bar re-rendering')
+  }, [])
 
   return (
     <div className={cl.bar}>
@@ -31,6 +43,7 @@ const ChatBar: React.FC<Props> = ({ room }) => {
           callState={callState}
           setCallState={setCallState}
           clients={clients} 
+          stopCall={stopCall}
           provideMediaRef={provideMediaRef}
         />
       }

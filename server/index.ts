@@ -156,10 +156,32 @@ io.on('connect', (socket) => {
     })
   })
 
+  const leaveRoom = () => {
+    console.log('peer disconnected')
+    const { rooms } = socket
+
+    Array.from(rooms).forEach(roomId => {
+      const clients = io.sockets.adapter.rooms.get(roomId) || []
+      console.log(clients)
+
+      Array.from(clients).forEach(clientId => {
+        if (clientId !== socket.id) {
+          io.to(clientId).emit(ACTIONS.REMOVE_PEER, {
+            peerId: socket.id
+          })
+  
+          socket.emit(ACTIONS.REMOVE_PEER, {
+            peerId: clientId
+          })
+        }
+      })
+    })
+  }
+
+  socket.on(ACTIONS.STOP_CALL, leaveRoom)
+  socket.on('disconnect', leaveRoom)
+  
   // ===========================
-  socket.on('disconnect', () =>
-    socketHandler.onDisconnect(socket)
-  )
   socket.on('connection_error', (err) => {
     console.log(err.req)
     console.log(err.code)

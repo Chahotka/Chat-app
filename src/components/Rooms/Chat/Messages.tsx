@@ -16,6 +16,10 @@ const Messages: React.FC<Props> = ({  messages }) => {
       bottomRef.current.scrollIntoView({behavior: 'auto'})
     }
   }, [messages])
+
+  useEffect(() => {
+    console.log('messages re-rendering')
+  }, [])
   
   return (
     <div className={cl.container}>

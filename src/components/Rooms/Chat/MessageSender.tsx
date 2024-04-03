@@ -31,6 +31,9 @@ const MessageSender: React.FC<Props> = ({ setMessages }) => {
     }
   }
 
+  useEffect(() => {
+    console.log('message sender re-rendering')
+  }, [])
 
   const onSend = () => {
     if (!user.activeRoom) {

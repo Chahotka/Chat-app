@@ -7,12 +7,13 @@ import phone from '../../../../images/phone.svg'
 interface Props {
   clients: string[]
   callState: CallState
+  stopCall: () => void
   setCallState: React.Dispatch<React.SetStateAction<CallState>>
   provideMediaRef: Function
   
 }
 
-const CallRoom: React.FC<Props> = ({ clients, callState, setCallState, provideMediaRef }) => {
+const CallRoom: React.FC<Props> = ({ clients, callState, stopCall, setCallState, provideMediaRef }) => {
   return (
   <div className={cl.callRoom}>
     <ul className={cl.clients}>
@@ -29,7 +30,7 @@ const CallRoom: React.FC<Props> = ({ clients, callState, setCallState, provideMe
     <div className={cl.callOptions}>
       { 
         callState === 'inCall' &&
-        <div className={cl.endCall}>
+        <div onClick={stopCall} className={cl.endCall}>
           <img className={cl.phone} src={phone} alt='end call'/>
         </div>
       }
@@ -39,6 +40,7 @@ const CallRoom: React.FC<Props> = ({ clients, callState, setCallState, provideMe
           <div className={cl.dot}></div>
         </div>
       }
+      { callState === 'disconnecting' && <p>Call ended</p>}
     </div>
   </div>
   )
