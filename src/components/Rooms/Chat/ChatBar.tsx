@@ -11,11 +11,12 @@ interface Props {
 
 const ChatBar: React.FC<Props> = ({ room }) => {
   const { 
+    localMediaStream,
+    peerMediaElements,
     clients, 
     call, 
     stopCall,
     callState, 
-    setCallState, 
     provideMediaRef 
   } = useWebRTC(room.roomId)
 
@@ -40,8 +41,9 @@ const ChatBar: React.FC<Props> = ({ room }) => {
       {
         callState !== 'idle' &&
         <CallRoom 
+          localStream={localMediaStream}
+          mediaElements={peerMediaElements}
           callState={callState}
-          setCallState={setCallState}
           clients={clients} 
           stopCall={stopCall}
           provideMediaRef={provideMediaRef}

@@ -1,19 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import cl from '../../../../styles/call-room.module.css'
 import { CallState } from '../../../hooks/useWebRTC'
 import Client from './Client'
 import phone from '../../../../images/phone.svg'
+import { MediaElements } from '../../../../interfaces/MediaElements'
 
 interface Props {
+  localStream: React.MutableRefObject<MediaStream | null>
+  mediaElements: React.MutableRefObject<MediaElements>
   clients: string[]
   callState: CallState
   stopCall: () => void
-  setCallState: React.Dispatch<React.SetStateAction<CallState>>
   provideMediaRef: Function
   
 }
 
-const CallRoom: React.FC<Props> = ({ clients, callState, stopCall, setCallState, provideMediaRef }) => {
+const CallRoom: React.FC<Props> = ({ localStream, mediaElements, clients, callState, stopCall, provideMediaRef }) => {
+  const [deafened, setDeafened] = useState(false)
+  
   return (
   <div className={cl.callRoom}>
     <ul className={cl.clients}>
@@ -21,8 +25,12 @@ const CallRoom: React.FC<Props> = ({ clients, callState, stopCall, setCallState,
         return (
           <Client 
             key={clientId} 
+            deafened={deafened}
+            setDeafened={setDeafened}
             clientId={clientId} 
             provideRef={provideMediaRef}
+            localStream={localStream}
+            mediaElements={mediaElements}
           />
         )
       })}

@@ -137,23 +137,23 @@ export const useWebRTC = (roomId: string) => {
     const onRemovePeer = ({ peerId }: { peerId: string }) => {
       console.log('Removing peer: ', peerId)
       updateClients([], () => {
-          if (peerConnections.current[peerId]) {
-            peerConnections.current[peerId].close()
-          }
-
-          if (localMediaStream.current) {
-            localMediaStream.current.getTracks().forEach(track => {
-              track.stop()
-            })
-          }
-          
-          delete peerConnections.current[peerId]
-          delete peerMediaElements.current[peerId]
-          delete peerMediaElements.current[LOCAL_VIDEO]
-
-          setCallState('disconnecting')
-          setTimeout(() => setCallState('idle'), 1000)
+        if (peerConnections.current[peerId]) {
+          peerConnections.current[peerId].close()
         }
+
+        if (localMediaStream.current) {
+          localMediaStream.current.getTracks().forEach(track => {
+            track.stop()
+          })
+        }
+
+        delete peerConnections.current[peerId]
+        delete peerMediaElements.current[peerId]
+        delete peerMediaElements.current[LOCAL_VIDEO]
+
+        setCallState('disconnecting')
+        setTimeout(() => setCallState('idle'), 1000)
+      }
       )
     }
 
@@ -172,6 +172,8 @@ export const useWebRTC = (roomId: string) => {
   }, [])
 
   return {
+    localMediaStream,
+    peerMediaElements,
     clients,
     call,
     stopCall,
