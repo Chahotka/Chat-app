@@ -11,6 +11,7 @@ export const useRooms = () => {
   const user = useAppSelector(state => state.user)
   const [rooms, setRooms] = useState<RoomUser[]>([])
   const [error, setError] = useState('')
+
   const { loading, fetching } = useFetch(async () => {
     const storageUser = sessionStorage.getItem('user')
 
@@ -63,12 +64,7 @@ export const useRooms = () => {
 
   useEffect(() => {
     updateRooms()
-
-    socket.on('connected', joinRooms)
-
-    return () => {
-      socket.off('connected')
-    }
+    joinRooms()
   }, [])
 
   useEffect(() => {
