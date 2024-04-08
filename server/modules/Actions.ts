@@ -1,4 +1,5 @@
-export const ACTIONS = {
+export const 
+ACTIONS = {
   CALL: 'call',
   STOP_CALL: 'stop-call',
   ADD_PEER: 'add-peer',
@@ -6,5 +7,9 @@ export const ACTIONS = {
   RELAY_SDP: 'relay-sdp',
   RELAY_ICE: 'relay-ice',
   ICE_CANDIDATE: 'ice-candidate',
-  SESSION_DESCRIPTION: 'session-description'
+  SESSION_DESCRIPTION: 'session-description',
+  ASK_PERMISSION: 'ask-permission',
+  CALL_PERMISSION: 'call-permission',
+  RELAY_PERMISSION: 'relay-permission'
+  
 }

@@ -15,7 +15,6 @@ const Main: React.FC = () => {
 
   useEffect(() => {
     console.log('main re-rendering')
-    socket.connect()
     const storedUser = sessionStorage.getItem('user')
 
     if (typeof storedUser === 'string') {

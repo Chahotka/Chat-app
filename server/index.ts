@@ -111,9 +111,11 @@ app.listen(5000, () => {
 // SOCKET.IO
 
 io.on('connect', (socket) => {
+  console.log('socket  connected')
   socketHandler.onConnect(socket)
 
   socket.on('join rooms', (roomIds) => {
+    console.log('joining rooms, ', roomIds)
     socketHandler.onJoin(socket, roomIds)
   })
 
@@ -125,31 +127,45 @@ io.on('connect', (socket) => {
     socketHandler.onSendMessage(socket, messageObject)
   })
   // ==================================
-
-  socket.on(ACTIONS.CALL, ({ roomId }) => {
+  socket.on(ACTIONS.ASK_PERMISSION, ({ caller, roomId }) => {
     const clients = io.sockets.adapter.rooms.get(roomId) || []
 
     Array.from(clients).forEach(clientId => {
       if (clientId !== socket.id) {
+        io.to(clientId).emit(ACTIONS.CALL_PERMISSION, {
+          callerName: caller,
+          callerId: socket.id
+        })
+      }
+    })
+  })
+  socket.on(ACTIONS.CALL, ({ roomId }) => { 
+    console.log('CALLING EVENT')
+    const clients = io.sockets.adapter.rooms.get(roomId) || []
+    console.log('CLIENTS: ', clients)
+    Array.from(clients).forEach(clientId => {
+      if (clientId !== socket.id) {
         io.to(clientId).emit(ACTIONS.ADD_PEER, {
           peerId: socket.id,
-          createOffer: false
+          createOffer: true
         })
 
         socket.emit(ACTIONS.ADD_PEER, {
           peerId: clientId,
-          createOffer: true
+          createOffer: false
         })
       }
     })
   })
   socket.on(ACTIONS.RELAY_ICE, ({ peerId, iceCandidate}) => {
+    console.log('RELAY ICE EVENT')
     io.to(peerId).emit(ACTIONS.ICE_CANDIDATE, {
       peerId: socket.id,
       iceCandidate
     })
   })
   socket.on(ACTIONS.RELAY_SDP, ({ peerId, sessionDescription }) => {
+    console.log('RELAY SDP EVENT')
     io.to(peerId).emit(ACTIONS.SESSION_DESCRIPTION, {
       peerId: socket.id,
       sessionDescription

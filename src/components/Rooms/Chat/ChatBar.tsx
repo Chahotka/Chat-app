@@ -14,14 +14,16 @@ const ChatBar: React.FC<Props> = ({ room }) => {
     localMediaStream,
     peerMediaElements,
     clients, 
-    call, 
+    askForCall, 
+    startCall,
     stopCall,
+    caller,
     callState, 
+    setCallState,
     provideMediaRef 
   } = useWebRTC(room.roomId)
 
   useEffect(() => {
-    console.log('chat bar re-rendering')
   }, [])
 
   return (
@@ -35,7 +37,7 @@ const ChatBar: React.FC<Props> = ({ room }) => {
           className={cl.call}
           src={callImg}
           alt="Make call"
-          onClick={call}
+          onClick={askForCall}
         />
       </div>
       {
@@ -43,8 +45,11 @@ const ChatBar: React.FC<Props> = ({ room }) => {
         <CallRoom 
           localStream={localMediaStream}
           mediaElements={peerMediaElements}
+          caller={caller}
           callState={callState}
+          setCallState={setCallState}
           clients={clients} 
+          startCall={startCall}
           stopCall={stopCall}
           provideMediaRef={provideMediaRef}
         />

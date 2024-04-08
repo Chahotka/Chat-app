@@ -4,18 +4,22 @@ import { ACTIONS } from "../../modules/Actions"
 import { MediaElements } from "../../interfaces/MediaElements"
 import { socket } from "../../socket/socket"
 import freeice from 'freeice'
+import { useAppSelector } from "../../app/hooks"
 
 export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 
 export type CallState = 'calling' | 'receiving' | 'disconnecting' | 'inCall' | 'idle'
+export type CallPermission = { callerName: string, callerId: string }
 type AddPeer = { peerId: string, createOffer: boolean }
 type iceCandidate = { peerId: string, iceCandidate: RTCIceCandidate }
 type sessionDescription = { peerId: string, sessionDescription: RTCSessionDescription }
 
 export const useWebRTC = (roomId: string) => {
+  const name = useAppSelector(state => state.user.name)
   const { state: clients, updateState: updateClients } = useStateWithCallback([])
 
   const [callState, setCallState] = useState<CallState>('idle')
+  const [caller, setCaller] = useState<CallPermission | null>(null)
   const peerConnections = useRef<{ [key: string]: RTCPeerConnection }>({})
   const peerMediaElements = useRef<MediaElements>({})
   const localMediaStream = useRef<MediaStream | null>(null)
@@ -43,7 +47,13 @@ export const useWebRTC = (roomId: string) => {
     })
   }
 
-  const call = () => {
+  const askForCall = () => {
+    setCallState('calling')
+    socket.emit(ACTIONS.ASK_PERMISSION, {caller: name, roomId })
+  }
+
+  const startCall = () => {
+    setCallState('calling')
     socket.emit(ACTIONS.CALL, { roomId })
   }
 
@@ -57,6 +67,7 @@ export const useWebRTC = (roomId: string) => {
     socket.emit(ACTIONS.STOP_CALL)
   }
 
+
   const provideMediaRef = (id: string, node: HTMLVideoElement | null) => {
     if (node) {
       peerMediaElements.current[id] = node
@@ -64,12 +75,14 @@ export const useWebRTC = (roomId: string) => {
   }
 
   useEffect(() => {
+    const onCallPermission = ({ callerName, callerId }: CallPermission) => {
+      setCallState('receiving')
+      setCaller({callerName, callerId})
+    }
     const onAddPeer = async ({ peerId, createOffer }: AddPeer) => {
       if (peerId in peerConnections) {
         return console.warn('Already added this peer')
       }
-
-      setCallState('inCall')
 
       peerConnections.current[peerId] = new RTCPeerConnection({
         iceServers: freeice()
@@ -103,6 +116,9 @@ export const useWebRTC = (roomId: string) => {
       }
       peerConnections.current[peerId].onconnectionstatechange = e => {
         console.log('CONNECTION STATE: ', peerConnections.current[peerId].connectionState)
+        if (peerConnections.current[peerId].connectionState === 'connected') {
+          setCallState('inCall')
+        }
       }
 
       if (createOffer) {
@@ -158,12 +174,14 @@ export const useWebRTC = (roomId: string) => {
     }
 
 
+    socket.on(ACTIONS.CALL_PERMISSION, onCallPermission)
     socket.on(ACTIONS.ADD_PEER, onAddPeer)
     socket.on(ACTIONS.REMOVE_PEER, onRemovePeer)
     socket.on(ACTIONS.ICE_CANDIDATE, onIceCandidate)
     socket.on(ACTIONS.SESSION_DESCRIPTION, onSessionDescription)
 
     return () => {
+      socket.off(ACTIONS.CALL_PERMISSION, onCallPermission)
       socket.off(ACTIONS.ADD_PEER, onAddPeer)
       socket.off(ACTIONS.REMOVE_PEER, onRemovePeer)
       socket.off(ACTIONS.ICE_CANDIDATE, onIceCandidate)
@@ -175,8 +193,10 @@ export const useWebRTC = (roomId: string) => {
     localMediaStream,
     peerMediaElements,
     clients,
-    call,
+    askForCall,
+    startCall,
     stopCall,
+    caller,
     callState,
     setCallState,
     provideMediaRef
