@@ -10,28 +10,41 @@ export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 
 export type CallState = 'calling' | 'receiving' | 'disconnecting' | 'inCall' | 'idle'
 export type CallPermission = { callerName: string, callerId: string }
+export type ProvideRef = (id: string, node: HTMLVideoElement | null) => void
+
 type AddPeer = { peerId: string, createOffer: boolean }
 type iceCandidate = { peerId: string, iceCandidate: RTCIceCandidate }
 type sessionDescription = { peerId: string, sessionDescription: RTCSessionDescription }
 
 export const useWebRTC = (roomId: string) => {
-  const name = useAppSelector(state => state.user.name)
+  const user = useAppSelector(state => state.user)
+
+  const [caller, setCaller] = useState<CallPermission>()
+  const [callState, setCallState] = useState<CallState>('idle')
+
   const { state: clients, updateState: updateClients } = useStateWithCallback([])
 
-  const [callState, setCallState] = useState<CallState>('idle')
-  const [caller, setCaller] = useState<CallPermission | null>(null)
-  const peerConnections = useRef<{ [key: string]: RTCPeerConnection }>({})
-  const peerMediaElements = useRef<MediaElements>({})
-  const localMediaStream = useRef<MediaStream | null>(null)
+  const localMediaStream = useRef<MediaStream>()
+  const localScreenStream = useRef<MediaStream>()
+
+  const peerMediaSenders = useRef<RTCRtpSender[]>([])
+  const peerConnections = useRef<{[key: string]: RTCPeerConnection}>({})
+  const peerMediaElements = useRef<{[key: string]: HTMLVideoElement}>({})
 
   const addNewClient = (newClient: string, cb: Function) => {
-    console.log('adding new client')
     if (!clients.includes(newClient)) {
-      updateClients((list: string[]) => [...list, newClient], cb)
+      updateClients((list: []) => [...list, newClient], cb)
     }
   }
 
+  const askPermission = () => {
+    console.log('ASKING PERMISSON FOR A CALL')
+    setCallState('calling')
+    socket.emit(ACTIONS.ASK_PERMISSION, { caller: user.name, roomId})
+  }
+
   const startCapture = async () => {
+    console.log('CAPTURING CAMERA')
     localMediaStream.current = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: true
@@ -40,148 +53,167 @@ export const useWebRTC = (roomId: string) => {
     addNewClient(LOCAL_VIDEO, () => {
       const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
 
-      if (localVideoElement) {
+      if (localVideoElement && localMediaStream.current) {
         localVideoElement.volume = 0
         localVideoElement.srcObject = localMediaStream.current
       }
     })
   }
-
-  const askForCall = () => {
-    setCallState('calling')
-    socket.emit(ACTIONS.ASK_PERMISSION, {caller: name, roomId })
+  const startScreenCapture = async () => {
+    console.log('CAPTURING SCREEN')
+    localScreenStream.current = await navigator.mediaDevices.getDisplayMedia({
+      audio: false,
+      video: true
+    })
+    
   }
 
-  const startCall = () => {
+  const shareScreen = async () => {
+    await startScreenCapture()
+    
+    const cameraStream = localMediaStream.current?.getTracks().find(track => track.kind === 'video')
+    const screenStream = localScreenStream.current?.getTracks().find(track => track.kind === 'video')
+
+    if (screenStream && cameraStream) {
+      peerMediaSenders.current
+        .find(sender => sender.track?.kind === 'video')
+        ?.replaceTrack(screenStream)
+      
+      screenStream.onended = () => {
+        peerMediaSenders.current
+          .find(sender => sender.track?.kind === 'video')
+          ?.replaceTrack(cameraStream)
+      }
+    }
+  }    
+
+  const startCall = async () => {
+    console.log('STARTING CALL')
     setCallState('calling')
     socket.emit(ACTIONS.CALL, { roomId })
   }
 
   const stopCall = () => {
-    if (localMediaStream.current) {
-      localMediaStream.current.getTracks().forEach(track => {
-        track.stop()
-      })
-    }
+    localMediaStream.current?.getTracks().forEach(track => {
+      track.stop()
+    })
 
     socket.emit(ACTIONS.STOP_CALL)
   }
 
-
-  const provideMediaRef = (id: string, node: HTMLVideoElement | null) => {
+  const provideMediaRef: ProvideRef = (id, node) => {
+    console.log('PROVIDING REF FOR: ', id, ' ', node)
     if (node) {
       peerMediaElements.current[id] = node
     }
   }
 
+  // FOR SOCKET EVENTS
   useEffect(() => {
-    const onCallPermission = ({ callerName, callerId }: CallPermission) => {
-      setCallState('receiving')
+    const onPermission = ({callerName, callerId}: CallPermission) => {
+      console.log('RECEIVING ASK FOR PERMISSION')
       setCaller({callerName, callerId})
+      setCallState('receiving')
     }
     const onAddPeer = async ({ peerId, createOffer }: AddPeer) => {
-      if (peerId in peerConnections) {
-        return console.warn('Already added this peer')
+      if (peerId in peerConnections.current) {
+        return console.warn('ALREADY ADDED THIS PEER')
       }
-
-      peerConnections.current[peerId] = new RTCPeerConnection({
-        iceServers: freeice()
-      })
+      console.log('ADDING PEER: ', peerId)
 
       await startCapture()
-        .then(() => {
-          if (localMediaStream.current) {
-            localMediaStream.current.getTracks().forEach(track => {
-              peerConnections.current[peerId].addTrack(track, localMediaStream.current!)
-            })
-          }
-        })
 
-      const dc = peerConnections.current[peerId].createDataChannel('channel')
+      peerConnections.current[peerId] = new RTCPeerConnection({iceServers: freeice()})
 
-      let trackNumber = 0
-      peerConnections.current[peerId].ontrack = ({ streams: [remoteStream] }) => {
-        trackNumber++
+      localMediaStream.current?.getTracks().forEach(track => {
+        if (localMediaStream.current) {
+          peerMediaSenders.current.push(peerConnections.current[peerId].addTrack(track, localMediaStream.current))
+        }
+      })
 
-        if (trackNumber === 2) {
+      peerConnections.current[peerId].ontrack = ({ track, streams: [remoteStream] }) => {
+        console.log('RECEIVING REMOTE STREAM ')
+        if (track.kind === 'video') {
           addNewClient(peerId, () => {
             peerMediaElements.current[peerId].srcObject = remoteStream
           })
         }
       }
-      peerConnections.current[peerId].onicecandidate = e => {
-        if (e.candidate) {
-          socket.emit(ACTIONS.RELAY_ICE, { peerId, iceCandidate: e.candidate })
+      peerConnections.current[peerId].onicecandidate = ({ candidate }) => {
+        if (candidate) {
+          console.log('SENDING NEW ICE CANDIDATE')
+          socket.emit(ACTIONS.RELAY_ICE, { peerId, iceCandidate: candidate})
         }
       }
-      peerConnections.current[peerId].onconnectionstatechange = e => {
+      peerConnections.current[peerId].onconnectionstatechange = () => {
         console.log('CONNECTION STATE: ', peerConnections.current[peerId].connectionState)
+
         if (peerConnections.current[peerId].connectionState === 'connected') {
           setCallState('inCall')
         }
       }
 
+
       if (createOffer) {
         const offer = await peerConnections.current[peerId].createOffer()
 
         await peerConnections.current[peerId].setLocalDescription(new RTCSessionDescription(offer))
-        socket.emit(ACTIONS.RELAY_SDP, { peerId, sessionDescription: offer })
+        socket.emit(ACTIONS.RELAY_SDP, {
+          peerId,
+          sessionDescription: offer
+        })
       }
     }
-    const onIceCandidate = async ({ peerId, iceCandidate }: iceCandidate) => {
-      try {
-        await peerConnections.current[peerId].addIceCandidate(new RTCIceCandidate(iceCandidate))
-        console.log('Exchanging Ice Candidates')
-      } catch (e) {
-        console.error('Error adding ice candidate: ', e)
-      }
-    }
-    const onSessionDescription = async ({ peerId, sessionDescription }: sessionDescription) => {
-      console.log('Exchanging SDP')
-      if (sessionDescription.type === 'offer') {
-        await peerConnections.current[peerId].setRemoteDescription(new RTCSessionDescription(sessionDescription))
-
-        const answer = await peerConnections.current[peerId].createAnswer()
-
-        await peerConnections.current[peerId].setLocalDescription(new RTCSessionDescription(answer))
-        socket.emit(ACTIONS.RELAY_SDP, { peerId, sessionDescription: answer })
-      }
-      if (sessionDescription.type === 'answer') {
-        await peerConnections.current[peerId].setRemoteDescription(new RTCSessionDescription(sessionDescription))
-      }
-    }
-    const onRemovePeer = ({ peerId }: { peerId: string }) => {
-      console.log('Removing peer: ', peerId)
-      updateClients([], () => {
+    const onRemovePeer = ({ peerId }: {peerId: string}) => {
+      updateClients((list: []) => list.filter(id => id !== peerId), () => {
         if (peerConnections.current[peerId]) {
           peerConnections.current[peerId].close()
         }
 
-        if (localMediaStream.current) {
-          localMediaStream.current.getTracks().forEach(track => {
-            track.stop()
-          })
-        }
+        localMediaStream.current?.getTracks().forEach(track => {
+          track.stop()
+        })
 
         delete peerConnections.current[peerId]
         delete peerMediaElements.current[peerId]
         delete peerMediaElements.current[LOCAL_VIDEO]
 
         setCallState('disconnecting')
-        setTimeout(() => setCallState('idle'), 1000)
+        setTimeout(() => setCallState('idle'), 1500)
+      })
+    }
+    const onIceCandidate = ({ peerId, iceCandidate }: iceCandidate) => {
+      console.log('RECEIVING ICE CANDIDATE')
+      peerConnections.current[peerId].addIceCandidate(new RTCIceCandidate(iceCandidate))
+    }
+    const onSessionDescription = async ({ peerId, sessionDescription }: sessionDescription) => {
+      if (sessionDescription.type === 'offer') {
+        console.log('RECEIVING OFFER')
+        await peerConnections.current[peerId].setRemoteDescription(new RTCSessionDescription(sessionDescription))
+      
+        const answer = await peerConnections.current[peerId].createAnswer()
+        
+        await peerConnections.current[peerId].setLocalDescription(new RTCSessionDescription(answer))
+        socket.emit(ACTIONS.RELAY_SDP, {
+          peerId,
+          sessionDescription: answer
+        })
       }
-      )
+      if (sessionDescription.type === 'answer') {
+        console.log('RECEIVING ANSWER')
+        await peerConnections.current[peerId].setRemoteDescription(new RTCSessionDescription(sessionDescription))
+      }
     }
 
-
-    socket.on(ACTIONS.CALL_PERMISSION, onCallPermission)
+    socket.on(ACTIONS.CALL_PERMISSION, onPermission)
     socket.on(ACTIONS.ADD_PEER, onAddPeer)
     socket.on(ACTIONS.REMOVE_PEER, onRemovePeer)
     socket.on(ACTIONS.ICE_CANDIDATE, onIceCandidate)
     socket.on(ACTIONS.SESSION_DESCRIPTION, onSessionDescription)
 
+
     return () => {
-      socket.off(ACTIONS.CALL_PERMISSION, onCallPermission)
+      socket.off(ACTIONS.CALL_PERMISSION, onPermission)
       socket.off(ACTIONS.ADD_PEER, onAddPeer)
       socket.off(ACTIONS.REMOVE_PEER, onRemovePeer)
       socket.off(ACTIONS.ICE_CANDIDATE, onIceCandidate)
@@ -189,16 +221,19 @@ export const useWebRTC = (roomId: string) => {
     }
   }, [])
 
+  
+
   return {
-    localMediaStream,
-    peerMediaElements,
     clients,
-    askForCall,
-    startCall,
-    stopCall,
     caller,
     callState,
     setCallState,
-    provideMediaRef
+    localMediaStream,
+    peerMediaElements,
+    startCall,
+    stopCall,
+    shareScreen,
+    askPermission,
+    provideMediaRef,
   }
 }

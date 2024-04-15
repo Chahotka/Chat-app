@@ -1,36 +1,37 @@
 import React, { useState } from 'react'
 import cl from '../../../../styles/call-room.module.css'
-import { CallPermission, CallState } from '../../../hooks/useWebRTC'
+import { CallPermission, CallState, ProvideRef } from '../../../hooks/useWebRTC'
 import Client from './Client'
 import phone from '../../../../images/phone.svg'
 import leon from '../../../../images/leon.mp4'
+import uii from '../../../../images/Chahotka.mp4'
 import { MediaElements } from '../../../../interfaces/MediaElements'
 import { socket } from '../../../../socket/socket'
 
 interface Props {
-  localStream: React.MutableRefObject<MediaStream | null>
-  mediaElements: React.MutableRefObject<MediaElements>
-  caller: CallPermission | null
   clients: string[]
+  caller: CallPermission | undefined
   callState: CallState
-  setCallState: React.Dispatch<React.SetStateAction<CallState>>
+  mediaElements: React.MutableRefObject<MediaElements>
+  localStream: React.MutableRefObject<MediaStream | undefined>
   startCall: () => void
   stopCall: () => void
-  provideMediaRef: Function
+  provideMediaRef: ProvideRef
+  shareScreen: () => void
   
 }
 
 const CallRoom: React.FC<Props> = (
   { 
+    clients,
+    caller,
+    callState,
     localStream,
     mediaElements,
-    clients,
-    caller, 
-    callState, 
-    setCallState,
     startCall,
-    stopCall, 
-    provideMediaRef 
+    stopCall,
+    shareScreen,
+    provideMediaRef,
   }
 ) => {
   const [deafened, setDeafened] = useState(false)
@@ -54,13 +55,14 @@ const CallRoom: React.FC<Props> = (
         {clients.map(clientId => {
           return (
             <Client 
-              key={clientId} 
+              key={clientId}
+              clientId={clientId}
               deafened={deafened}
               setDeafened={setDeafened}
-              clientId={clientId} 
-              provideRef={provideMediaRef}
               localStream={localStream}
               mediaElements={mediaElements}
+              shareScreen={shareScreen}
+              provideRef={provideMediaRef}
             />
           )
         })}
