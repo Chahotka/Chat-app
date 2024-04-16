@@ -11,16 +11,27 @@ interface Props {
   setDeafened: React.Dispatch<React.SetStateAction<boolean>>
   localStream: React.MutableRefObject<MediaStream | undefined>
   mediaElements: React.MutableRefObject<MediaElements>
+  isSharing: boolean
+  setIsSharing: React.Dispatch<React.SetStateAction<boolean>>
   clientId: string
   provideRef: ProvideRef
-  shareScreen: () => void
+  shareScreen: (share: boolean) => void
 }
 
-const Client: React.FC<Props> = ({ deafened, setDeafened, localStream, mediaElements, clientId, provideRef, shareScreen }) => {
+const Client: React.FC<Props> = ({ 
+  deafened, 
+  setDeafened, 
+  isSharing, 
+  setIsSharing,
+  localStream, 
+  mediaElements, 
+  clientId,
+  provideRef,
+  shareScreen 
+}) => {
   const [muted, setMuted] = useState(false)
-  const [sharing, setSharing] =useState(false)
 
-  const optionsHandler = (type: 'mute' | 'deafen' | 'share') => {
+  const optionsHandler = (type: 'mute' | 'deafen') => {
     console.log('VOLUMING IN: ', clientId)
     if (type === 'mute') {
       if (deafened && clientId === 'LOCAL_VIDEO') {
@@ -38,7 +49,7 @@ const Client: React.FC<Props> = ({ deafened, setDeafened, localStream, mediaElem
         setDeafened(false)
       }
     } else if (type === 'share') {
-      setSharing(prev => !prev)
+      setIsSharing(prev => !prev)
     }
   }
 
@@ -50,9 +61,6 @@ const Client: React.FC<Props> = ({ deafened, setDeafened, localStream, mediaElem
     }
   }, [muted])
 
-  useEffect(() => {
-    sharing && shareScreen()
-  }, [sharing])
 
   return (
     <li key={clientId} className={cl.clientBox}>
@@ -93,14 +101,19 @@ const Client: React.FC<Props> = ({ deafened, setDeafened, localStream, mediaElem
         {
           clientId === 'LOCAL_VIDEO' &&
           <li
-            onClick={() => optionsHandler('share')}
-            className={sharing
+            onClick={() => {
+              setIsSharing(prev => {
+                shareScreen(!prev)
+                return !prev
+              })
+            }}
+            className={isSharing
               ? [cl.streamOption, cl.muted].join(' ')
               : cl.streamOption
             }
           >
             <img className={cl.optionImg} src={screen} alt='share screen'/>
-            <p className={cl.optionText}>{sharing ? 'Stop share' : 'Share screen'}</p>
+            <p className={cl.optionText}>{isSharing ? 'Stop share' : 'Share screen'}</p>
           </li>
         }
       </ul>

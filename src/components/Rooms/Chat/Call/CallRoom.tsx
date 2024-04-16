@@ -12,13 +12,14 @@ interface Props {
   clients: string[]
   caller: CallPermission | undefined
   callState: CallState
+  isSharing: boolean
+  setIsSharing: React.Dispatch<React.SetStateAction<boolean>>
   mediaElements: React.MutableRefObject<MediaElements>
   localStream: React.MutableRefObject<MediaStream | undefined>
   startCall: () => void
   stopCall: () => void
   provideMediaRef: ProvideRef
-  shareScreen: () => void
-  
+  shareScreen: (share: boolean) => void
 }
 
 const CallRoom: React.FC<Props> = (
@@ -26,6 +27,8 @@ const CallRoom: React.FC<Props> = (
     clients,
     caller,
     callState,
+    isSharing,
+    setIsSharing,
     localStream,
     mediaElements,
     startCall,
@@ -59,6 +62,8 @@ const CallRoom: React.FC<Props> = (
               clientId={clientId}
               deafened={deafened}
               setDeafened={setDeafened}
+              isSharing={isSharing}
+              setIsSharing={setIsSharing}
               localStream={localStream}
               mediaElements={mediaElements}
               shareScreen={shareScreen}

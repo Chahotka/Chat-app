@@ -5,6 +5,7 @@ import { MediaElements } from "../../interfaces/MediaElements"
 import { socket } from "../../socket/socket"
 import freeice from 'freeice'
 import { useAppSelector } from "../../app/hooks"
+import e from "cors"
 
 export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 
@@ -19,12 +20,13 @@ type sessionDescription = { peerId: string, sessionDescription: RTCSessionDescri
 export const useWebRTC = (roomId: string) => {
   const user = useAppSelector(state => state.user)
 
-  const [caller, setCaller] = useState<CallPermission>()
-  const [callState, setCallState] = useState<CallState>('idle')
-
   const { state: clients, updateState: updateClients } = useStateWithCallback([])
 
-  const localMediaStream = useRef<MediaStream>()
+  const [caller, setCaller] = useState<CallPermission>()
+  const [callState, setCallState] = useState<CallState>('idle')
+  const [isSharing, setIsSharing] = useState(false)
+
+  const localCameraStream = useRef<MediaStream>()
   const localScreenStream = useRef<MediaStream>()
 
   const peerMediaSenders = useRef<RTCRtpSender[]>([])
@@ -45,7 +47,7 @@ export const useWebRTC = (roomId: string) => {
 
   const startCapture = async () => {
     console.log('CAPTURING CAMERA')
-    localMediaStream.current = await navigator.mediaDevices.getUserMedia({
+    localCameraStream.current = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: true
     })
@@ -53,9 +55,9 @@ export const useWebRTC = (roomId: string) => {
     addNewClient(LOCAL_VIDEO, () => {
       const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
 
-      if (localVideoElement && localMediaStream.current) {
+      if (localVideoElement && localCameraStream.current) {
         localVideoElement.volume = 0
-        localVideoElement.srcObject = localMediaStream.current
+        localVideoElement.srcObject = localCameraStream.current
       }
     })
   }
@@ -65,24 +67,55 @@ export const useWebRTC = (roomId: string) => {
       audio: false,
       video: true
     })
-    
+
+    setIsSharing(true)
   }
 
-  const shareScreen = async () => {
-    await startScreenCapture()
-    
-    const cameraStream = localMediaStream.current?.getTracks().find(track => track.kind === 'video')
-    const screenStream = localScreenStream.current?.getTracks().find(track => track.kind === 'video')
+  const shareScreen = async (share: boolean) => {
+    const cameraStream = localCameraStream.current?.getTracks().find(track => track.kind === 'video')
 
-    if (screenStream && cameraStream) {
-      peerMediaSenders.current
-        .find(sender => sender.track?.kind === 'video')
-        ?.replaceTrack(screenStream)
-      
-      screenStream.onended = () => {
-        peerMediaSenders.current
-          .find(sender => sender.track?.kind === 'video')
-          ?.replaceTrack(cameraStream)
+    if (share && cameraStream) {
+      await startScreenCapture()
+      const screenStream = localScreenStream.current?.getTracks().find(track => track.kind === 'video')
+
+      if (screenStream) {
+        screenStream.onended = () => {
+          localScreenStream.current?.getTracks().forEach(track => track.stop())
+
+          const localVideo = peerMediaElements.current[LOCAL_VIDEO]
+  
+          if (localVideo && localCameraStream.current) {
+            localVideo.volume = 0
+            localVideo.srcObject = localCameraStream.current
+          }
+          
+          peerMediaSenders.current.find(sender => sender.track?.kind === 'video')
+            ?.replaceTrack(cameraStream)
+
+          setIsSharing(false)
+        }
+
+        peerMediaSenders.current.find(sender => sender.track?.kind === 'video')
+          ?.replaceTrack(screenStream)
+  
+        const localVideo = peerMediaElements.current[LOCAL_VIDEO]
+  
+        if (localVideo && localScreenStream.current) {
+          localVideo.volume = 0
+          localVideo.srcObject = localScreenStream.current
+        }
+      }
+    } else if (!share && cameraStream) {
+      localScreenStream.current?.getTracks().forEach(track => track.stop())
+
+      peerMediaSenders.current.find(sender => sender.track?.kind === 'video')
+        ?.replaceTrack(cameraStream)
+
+      const localVideo = peerMediaElements.current[LOCAL_VIDEO]
+  
+      if (localVideo && localCameraStream.current) {
+        localVideo.volume = 0
+        localVideo.srcObject = localCameraStream.current
       }
     }
   }    
@@ -94,7 +127,7 @@ export const useWebRTC = (roomId: string) => {
   }
 
   const stopCall = () => {
-    localMediaStream.current?.getTracks().forEach(track => {
+    localCameraStream.current?.getTracks().forEach(track => {
       track.stop()
     })
 
@@ -125,9 +158,9 @@ export const useWebRTC = (roomId: string) => {
 
       peerConnections.current[peerId] = new RTCPeerConnection({iceServers: freeice()})
 
-      localMediaStream.current?.getTracks().forEach(track => {
-        if (localMediaStream.current) {
-          peerMediaSenders.current.push(peerConnections.current[peerId].addTrack(track, localMediaStream.current))
+      localCameraStream.current?.getTracks().forEach(track => {
+        if (localCameraStream.current) {
+          peerMediaSenders.current.push(peerConnections.current[peerId].addTrack(track, localCameraStream.current))
         }
       })
 
@@ -170,7 +203,7 @@ export const useWebRTC = (roomId: string) => {
           peerConnections.current[peerId].close()
         }
 
-        localMediaStream.current?.getTracks().forEach(track => {
+        localCameraStream.current?.getTracks().forEach(track => {
           track.stop()
         })
 
@@ -228,7 +261,9 @@ export const useWebRTC = (roomId: string) => {
     caller,
     callState,
     setCallState,
-    localMediaStream,
+    isSharing,
+    setIsSharing,
+    localCameraStream,
     peerMediaElements,
     startCall,
     stopCall,
