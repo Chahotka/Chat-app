@@ -1,119 +1,70 @@
 .callRoom {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   position: absolute;
-  background: rgb(181,106,106);
-  background: linear-gradient(0deg, rgb(25, 23, 58) 20%, rgb(0, 0, 0) 100%);
+  background: rgb(21, 19, 41);
+  background: linear-gradient(rgb(21, 19, 41) 20%, rgb(17, 10, 10) 100%);
   z-index: 4;
 }
 
-
-.callBg video {
+.receiving {
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: fill;
-  position: absolute;
-  z-index: -1;
-  filter: brightness(40%);
-}
-
-
-.clients {
   gap: 20px;
-  display: flex;
-  max-height: 150px;
-  z-index: 2;
-}
-
-.callOptions {
-  margin-top: 50px;
-}
-
-.endCall {
-  padding: 10px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #c20e0e;
-  cursor: pointer;
-  opacity: .8;
-  transition: all 0.3s;
-}
-.endCall:hover {
-  scale: 1.1;
-  opacity: 1;
-}
-
-.endCall.green {
-  background: rgb(9, 143, 9);
-}
-
-.phone {
-  width: 20px;
-}
-
-.connectingBox {
   display: flex;
   align-items: center;
   flex-direction: column;
-}
-
-.connecting {
-  margin-top: 40px;
-  width: 10px;
-  position: relative;
-}
-
-.connecting::before,
-.connecting::after,
-.dot {
-  content: "";
-  top: 0;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #fff;
+  justify-content: center;
+  border: 1px solid #fff;
   position: absolute;
-  animation: jump infinite 1s ease-in;
 }
 
-.connecting::before {
-  left: 14px;
-  animation-delay: .2s;
-}
-.connecting::after {
-  right: 14px;
+.caller {
+  z-index: 6;
 }
 
-.dot {
-  animation-delay: .1s;
-}
-
-@keyframes jump {
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.receiving {
-  letter-spacing: 2px;
-  z-index: 1;
-}
-
-.callerName span {
+.callerName {
   font-weight: 700;
+  letter-spacing: 2px;
 }
 
 .receivingOptions {
-  margin-top: 30px;
-  gap: 15px;
+  gap: 20px;
   display: flex;
-  justify-content: center;
+}
+.receivingOption {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: green;
+  position: relative;
+  transition: all 0.3s;
+  opacity: 0.7;
+}
+.receivingOption:hover {
+  opacity: 1;
+  scale: 1.1;
+}
+.receivingOption.red {
+  rotate: -136deg;
+  background: red;
+}
+.receivingOption img {
+  top: 50%;
+  left: 50%;
+  width: 25px;
+  transform: translate(-52%,-52%);
+  position: absolute;
+}
+
+.receivingBg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  filter: brightness(40%);
 }
