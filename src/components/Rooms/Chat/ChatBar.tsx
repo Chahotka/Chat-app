@@ -14,7 +14,6 @@ const ChatBar: React.FC<Props> = ({ room }) => {
     clients,
     caller,
     callState,
-    setCallState,
     isSharing,
     setIsSharing,
     localCameraStream,

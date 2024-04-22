@@ -6,6 +6,7 @@
   position: absolute;
   background: rgb(21, 19, 41);
   background: linear-gradient(rgb(21, 19, 41) 20%, rgb(17, 10, 10) 100%);
+  background: #555;
   z-index: 4;
 }
 
@@ -63,7 +64,7 @@
 .receivingBg {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: fill;
   position: absolute;
   filter: brightness(40%);
 }
@@ -127,4 +128,105 @@
   50% {
     transform: translateY(-5px);
   }
+}
+
+.inCall {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  gap: 40px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  position: absolute;
+}
+
+.clients {
+  gap: 20px;
+  display: flex;
+}
+
+.client {
+  width: 250px;
+  height: 170px;
+  border-radius: 10px;
+  border: 1px solid #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.client:hover .clientOptions {
+  opacity: 1;
+}
+
+.clientVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.clientOptions {
+  padding: 0 10px;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: absolute;
+  opacity: 0;
+  transition: all 0.3s;
+  background: #00000080;
+}
+
+.clientOption {
+  position: relative;
+}
+
+.clientOption::before {
+  content: '';
+  top: 9px;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  rotate: 50deg;
+  translate: -50%;
+  background: #fff;
+  position: absolute;
+  transition: all 0.3s;
+}
+
+.clientOption.active::before {
+  width: 25px;
+}
+
+.clientOption.active img {
+  opacity: 0.5;
+}
+
+
+.clientOption img {
+  width: 20px;
+}
+
+.clientOptionText {
+  padding: 5px;
+  top: -30px;
+  left: 50%;
+  translate: -50%;
+  font-size: 10px;
+  text-transform: uppercase;
+  background: #0000009d;
+  border-radius: 20px;
+  opacity: 0;
+  position: absolute;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.clientOption:hover .clientOptionText {
+  opacity: 1;
 }

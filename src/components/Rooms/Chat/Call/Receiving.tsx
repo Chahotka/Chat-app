@@ -15,7 +15,7 @@ const Receiving: React.FC<Props> = ({caller, stopCall, startCall}) => {
     <div className={cl.receiving}>
       <video className={cl.receivingBg} autoPlay playsInline loop src={callBg}></video>
       <div className={cl.caller}>
-        <p className={cl.callerName}>{caller?.callerName}MUTMUT calling...</p>
+        <p className={cl.callerName}>{caller?.callerName} calling...</p>
       </div>
       <div className={cl.receivingOptions}>
         <div onClick={startCall} className={cl.receivingOption}>

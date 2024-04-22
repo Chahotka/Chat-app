@@ -132,12 +132,15 @@ export const useWebRTC = (roomId: string) => {
     })
 
     socket.emit(ACTIONS.STOP_CALL)
+    setCallState('disconnecting')
+    setTimeout(() => setCallState('idle'), 1500)
   }
 
   const provideMediaRef: ProvideRef = (id, node) => {
-    console.log('PROVIDING REF FOR: ', id, ' ', node)
     if (node) {
+      console.log('PROVIDING REF FOR: ', id, ' ', node)
       peerMediaElements.current[id] = node
+      console.log(peerMediaElements.current)
     }
   }
 
@@ -152,9 +155,9 @@ export const useWebRTC = (roomId: string) => {
       if (peerId in peerConnections.current) {
         return console.warn('ALREADY ADDED THIS PEER')
       }
-      console.log('ADDING PEER: ', peerId)
 
       await startCapture()
+      setCallState('inCall')
 
       peerConnections.current[peerId] = new RTCPeerConnection({iceServers: freeice()})
 
@@ -180,10 +183,6 @@ export const useWebRTC = (roomId: string) => {
       }
       peerConnections.current[peerId].onconnectionstatechange = () => {
         console.log('CONNECTION STATE: ', peerConnections.current[peerId].connectionState)
-
-        if (peerConnections.current[peerId].connectionState === 'connected') {
-          setCallState('inCall')
-        }
       }
 
 
@@ -198,6 +197,7 @@ export const useWebRTC = (roomId: string) => {
       }
     }
     const onRemovePeer = ({ peerId }: {peerId: string}) => {
+      console.log('REMOVING PEER')
       updateClients((list: []) => list.filter(id => id !== peerId), () => {
         if (peerConnections.current[peerId]) {
           peerConnections.current[peerId].close()
