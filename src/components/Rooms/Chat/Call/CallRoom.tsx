@@ -35,9 +35,10 @@ const CallRoom: React.FC<Props> = (
     provideMediaRef,
   }
 ) => {
+  const [hidden, setHidden] = useState(false)
 
   return (
-    <div className={cl.callRoom}>
+    <div className={hidden ? [cl.callRoom, cl.hidden].join(' ') : cl.callRoom}>
       {callState === 'calling' && 
         <Calling />
       }
@@ -56,6 +57,13 @@ const CallRoom: React.FC<Props> = (
           provideMedia={provideMediaRef}
         />
       }
+      <div 
+        onClick={() => setHidden(prev => !prev)} 
+        className={ hidden
+          ? [cl.roller, cl.hidden].join(' ')
+          : cl.roller
+        } 
+      />
     </div>
   )
 }
