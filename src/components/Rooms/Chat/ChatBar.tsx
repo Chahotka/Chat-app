@@ -3,7 +3,9 @@ import callImg from '../../../images/phone.svg'
 import { RoomUser } from '../../../interfaces/RoomUser'
 import { useWebRTC } from '../../hooks/useWebRTC'
 import CallRoom from './Call/CallRoom'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { socket } from '../../../socket/socket'
+import { ACTIONS } from '../../../modules/Actions'
 
 interface Props {
   room: RoomUser
@@ -24,7 +26,12 @@ const ChatBar: React.FC<Props> = ({ room }) => {
     askPermission,
     provideMediaRef
   } = useWebRTC(room.roomId)
-
+  
+  useEffect(() => {
+    return () => {
+      socket.emit(ACTIONS.STOP_CALL)
+    }
+  }, [])
 
   return (
     <div className={cl.bar}>

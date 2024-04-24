@@ -254,7 +254,6 @@ export const useWebRTC = (roomId: string) => {
     }
   }, [])
 
-  
 
   return {
     clients,

@@ -60,7 +60,7 @@ const ClientOptions: React.FC<Props> = (
 
   useEffect(() => {
     if (clientId === 'LOCAL_VIDEO' && localStream.current) {
-      localStream.current.getAudioTracks()[0].enabled = muted
+      localStream.current.getAudioTracks()[0].enabled = !muted
     } else {
       mediaElements.current[clientId].volume = muted ? 0 : 1
     }
