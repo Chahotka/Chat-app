@@ -1,11 +1,9 @@
-import { MutableRefObject, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useStateWithCallback } from "./useStateWithCallback"
 import { ACTIONS } from "../../modules/Actions"
-import { MediaElements } from "../../interfaces/MediaElements"
 import { socket } from "../../socket/socket"
 import freeice from 'freeice'
 import { useAppSelector } from "../../app/hooks"
-import e from "cors"
 
 export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 
@@ -198,7 +196,7 @@ export const useWebRTC = (roomId: string) => {
     }
     const onRemovePeer = ({ peerId }: {peerId: string}) => {
       console.log('REMOVING PEER')
-      updateClients((list: []) => list.filter(id => id !== peerId), () => {
+      updateClients([], () => {
         if (peerConnections.current[peerId]) {
           peerConnections.current[peerId].close()
         }
@@ -251,6 +249,9 @@ export const useWebRTC = (roomId: string) => {
       socket.off(ACTIONS.REMOVE_PEER, onRemovePeer)
       socket.off(ACTIONS.ICE_CANDIDATE, onIceCandidate)
       socket.off(ACTIONS.SESSION_DESCRIPTION, onSessionDescription)
+
+      localCameraStream.current?.getTracks().forEach(track => track.stop())
+      localScreenStream.current?.getTracks().forEach(track => track.stop())
     }
   }, [])
 

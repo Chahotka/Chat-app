@@ -5,6 +5,7 @@ import { MediaElements } from '../../../../interfaces/MediaElements'
 import Receiving from './Receiving'
 import Calling from './Calling'
 import InCall from './InCall'
+import Disconnecting from './Disconnecting'
 
 interface Props {
   clients: string[]
@@ -57,6 +58,7 @@ const CallRoom: React.FC<Props> = (
           provideMedia={provideMediaRef}
         />
       }
+      { callState === 'disconnecting' && <Disconnecting /> }
       <div 
         onClick={() => setHidden(prev => !prev)} 
         className={ hidden
