@@ -8,20 +8,11 @@
   overflow-x: hidden;
 }
 
-.sizer {
-  top: 0;
-  left: 0;
-  width: 5px;
-  height: 100%;
-  position: absolute;
-  cursor: col-resize;
-  opacity: 0;
-  z-index: 2;
-}
 
 .roomsList {
   margin-top: 20px;
   width: 100%;
+  z-index: 0;
 }
 
 .rooms::-webkit-scrollbar {

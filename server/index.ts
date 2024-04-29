@@ -104,6 +104,14 @@ app.post('/get-rooms', async (req: Request, res: Response) => {
 
   res.send(rooms)
 })
+app.post('/create-group', async (req: Request, res: Response) => {
+  await dbHandler.createGroup(
+    req.body.groupId,
+    req.body.creator,
+    req.body.selectedUsers
+  )
+})
+
 app.listen(5000, () => {
   console.log('Listen on port: ', 5000, ' blya')
 })

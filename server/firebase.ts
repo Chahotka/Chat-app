@@ -70,8 +70,8 @@ export const dbHandler = {
       await userRef.update({rooms: [...userRooms, {roomId, userId: creator}]})
       
       await db.collection('rooms_messages').doc(roomId).set({
-        user1: creator,
-        user2: user,
+        type: 'direct',
+        usersId: [creator, user],
         messages: [],
         roomId 
       })
@@ -115,6 +115,40 @@ export const dbHandler = {
     } else {
       return data.messages
     }
+  },
+  createGroup: async (groupId: string, creator: string, selectedUsers: string[]) => {
+    const usersRef = db.collection('users_list')
+    const creatorRef = db.collection('users_list').doc(creator)
+    const groupRef = db.collection('rooms-messages').doc(groupId)
+
+    const creatorData = (await creatorRef.get()).data()
+
+    if (typeof creatorData !== 'undefined') {
+      const creatorRooms = creatorData.rooms || []
+
+      await creatorRef.update({rooms: [...creatorRooms, {roomId: groupId, usersId: selectedUsers}]})
+    }
+
+    for (let userId of selectedUsers) {
+      const filteredUsers = selectedUsers.filter(id => id !== userId)
+
+
+      const userRef = usersRef.doc(userId)
+      const userData = (await userRef.get()).data()
+
+      if (typeof userData !== 'undefined') {
+        const userRooms = userData.rooms || []
+
+        await userRef.update({rooms: [...userRooms, {roomId: groupId, usersId: [creator, ...filteredUsers]}]})
+      }
+    }
+
+    await db.collection('rooms_messages').doc(groupId).set({
+      type: 'group',
+      users: [creator, ...selectedUsers],
+      messages: [],
+      roomId: groupId
+    })
   }
 }
 

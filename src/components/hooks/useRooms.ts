@@ -17,17 +17,17 @@ export const useRooms = () => {
 
     if (typeof storageUser === 'string') {
       const parsedUser = JSON.parse(storageUser)
+      const rooms = parsedUser.rooms.filter((room: any) => room.userId)
 
       const response = await fetch('http://localhost:5000/get-rooms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(parsedUser.rooms)
+        body: JSON.stringify(rooms)
       })
 
       const data: RoomUser[] = await response.json()
-
       setRooms(data)
       dispatch(addRooms(data))
       sessionStorage.setItem('rooms', JSON.stringify(data))
@@ -54,8 +54,8 @@ export const useRooms = () => {
   const joinRooms = () => {
     const storedUser = sessionStorage.getItem('user')
 
-    if (typeof storedUser === 'string' && JSON.parse(storedUser).rooms.length > 0) {
-      const parsedRooms: RoomUser[] = JSON.parse(storedUser).rooms
+    if (typeof storedUser === 'string') {
+      const parsedRooms: RoomUser[] = JSON.parse(storedUser).rooms || []
       const roomIds = parsedRooms.map(room => room.roomId)
 
       socket.emit('join rooms', roomIds)

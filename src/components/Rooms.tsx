@@ -3,7 +3,6 @@ import cl from '../styles/rooms.module.css'
 import RoomsList from './Rooms/RoomsList'
 import Sidebar from './Rooms/Sidebar'
 import { useFilter } from './hooks/useFilter'
-import AddRoom from './Rooms/Sidebar/AddRoom'
 import { useRooms } from './hooks/useRooms'
 import { useEscape } from './hooks/useEscape'
 
@@ -21,16 +20,11 @@ const Rooms: React.FC<Props> = ({ width, setActive }) => {
 
   return (
     <div className={cl.rooms}>
-      <div
-        className={cl.sizer}
-        style={{ left: width }}
-        onMouseDown={() => setActive(true)}
-      ></div>
       <Sidebar
-        active={sidebarActive}
-        setActive={setSidebarActive}
         name={name}
         setName={setName}
+        active={sidebarActive}
+        setActive={setSidebarActive}
       />
       {rooms.length > 0 &&
         <ul className={cl.roomsList}>

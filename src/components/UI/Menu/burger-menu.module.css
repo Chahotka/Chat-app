@@ -1,22 +1,14 @@
-
-.menu {
-  padding: 15px 10px;
-  display: grid;
-  column-gap: 20px;
-  align-items: center;
-  grid-template-columns: min-content 1fr;
-}
-
 .burger {
   width: 25px;
   height: 17px;
   cursor: pointer;
   position: relative;
-  z-index: 4;
+  z-index: 3;
 }
+
 .burger::before, .burger::after {
   content: '';
-  width: 100%;
+  width: 25px;
   height: 1px;
   background: #fff;
   position: absolute;
@@ -30,7 +22,7 @@
 }
 .burgerSpan {
   top: 8px;
-  width: 100%;
+  width: 25px;
   height: 1px;
   background: #fff;
   position: absolute;
@@ -46,13 +38,4 @@
 }
 .burger.active .burgerSpan {
   scale: 0;
-}
-.input {
-  width: 100%;
-  padding: 4px 5px;
-  background: transparent;
-  border-radius: 10px;
-  border: 1px solid #fff;
-  position: relative;
-  z-index: 2;
 }

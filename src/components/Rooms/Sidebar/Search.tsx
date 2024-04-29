@@ -1,15 +1,15 @@
 import React, { useRef, useState } from 'react'
-import cl from '../../styles/search.module.css'
-import Button from '../UI/Button/Button'
-import SearchProps from './SearchProps'
-import { useAddUser } from '../hooks/useAddUser'
-import Loader from '../UI/Loader/Loader'
+import cl from '../../../styles/search.module.css'
+import Button from '../../UI/Button/Button'
+import SearchProps from '../SearchProps'
+import { useAddUser } from '../../hooks/useAddUser'
+import Loader from '../../UI/Loader/Loader'
 
 interface Props {
   setActive: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const Search: React.FC<Props> = ({setActive}) => {
+const Search: React.FC<Props> = ({ setActive }) => {
   const bg = useRef<HTMLDivElement>(null)
   const [searchText, setSearchText] = useState('')
   const [searchBy, setSearchBy] = useState('email')
@@ -27,30 +27,30 @@ const Search: React.FC<Props> = ({setActive}) => {
     setSearchText('')
     setActive(false)
   }
-  
+
   return (
-    <div 
+    <div
       ref={bg}
       className={cl.searchBg}
       onClick={(e: React.MouseEvent) => bgClickHandler(e)}
     >
       <div className={cl.search}>
-        <div 
+        <div
           className={cl.close}
           onClick={() => setActive(false)}
         ></div>
         <h1 className={cl.title}>Add user</h1>
-        <p className={cl.error}>{ error }</p>
-        <SearchProps searchText={searchText} setSearchText={setSearchText} setSearchBy={setSearchBy}/>
+        <p className={cl.error}>{error}</p>
+        <SearchProps searchText={searchText} setSearchText={setSearchText} setSearchBy={setSearchBy} />
         {loading ?
-          <Loader 
-            size='normal' 
-            pos='center' 
-            addStyles={{marginTop: '20px'}}
+          <Loader
+            size='normal'
+            pos='center'
+            addStyles={{ marginTop: '20px' }}
           />
-        :
-          <Button 
-            text='add' 
+          :
+          <Button
+            text='add'
             styles={{
               marginTop: '40px',
               height: '30px',
@@ -58,7 +58,7 @@ const Search: React.FC<Props> = ({setActive}) => {
               fontSize: '10px',
               zIndex: '1'
             }}
-            action={onSearch} 
+            action={onSearch}
           />
         }
       </div>

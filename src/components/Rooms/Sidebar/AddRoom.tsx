@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
-import cl from '../../styles/add-room.module.css'
-import Button from '../UI/Button/Button'
+import cl from '../../../styles/add-room.module.css'
+import Button from '../../UI/Button/Button'
 import Search from './Search'
-  
+
 
 const AddRoom: React.FC = () => {
   const [active, setActive] = useState(false)
 
   return (
     <div className={cl.add}>
-      <Button 
+      <Button
         styles={{
           marginTop: '10px',
           height: '30px',
@@ -17,9 +17,9 @@ const AddRoom: React.FC = () => {
           fontSize: '12px',
           zIndex: '1',
         }}
-        text='Add Rooms' action={() => setActive(prev => !prev) } 
+        text='Add Room' action={() => setActive(prev => !prev)}
       />
-      { active && <Search setActive={setActive}/>}
+      {active && <Search setActive={setActive} />}
     </div>
   )
 }
