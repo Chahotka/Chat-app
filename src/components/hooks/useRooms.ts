@@ -5,11 +5,12 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { addRooms } from "../../features/user/UserSlice"
 import { socket } from "../../socket/socket"
 import { Message } from "../../interfaces/Message"
+import { GroupUser } from "../../interfaces/GroupUser"
 
 export const useRooms = () => {
   const dispatch = useAppDispatch()
   const user = useAppSelector(state => state.user)
-  const [rooms, setRooms] = useState<RoomUser[]>([])
+  const [rooms, setRooms] = useState<(RoomUser | GroupUser)[]>([])
   const [error, setError] = useState('')
 
   const { loading, fetching } = useFetch(async () => {
@@ -17,17 +18,20 @@ export const useRooms = () => {
 
     if (typeof storageUser === 'string') {
       const parsedUser = JSON.parse(storageUser)
-      const rooms = parsedUser.rooms.filter((room: any) => room.userId)
+      console.log(parsedUser)
 
       const response = await fetch('http://localhost:5000/get-rooms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(rooms)
+        body: JSON.stringify(parsedUser.rooms)
       })
 
-      const data: RoomUser[] = await response.json()
+      const data: (RoomUser | GroupUser)[] = await response.json()
+
+      console.log(data)
+
       setRooms(data)
       dispatch(addRooms(data))
       sessionStorage.setItem('rooms', JSON.stringify(data))

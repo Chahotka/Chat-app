@@ -3,6 +3,7 @@ import { useFetch } from "./useFetch"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { UserState, addRoom } from "../../features/user/UserSlice"
 import { RoomUser } from "../../interfaces/RoomUser"
+import { GroupUser } from "../../interfaces/GroupUser"
 
 export const useAddUser = (
   searchText: string,
@@ -21,7 +22,7 @@ export const useAddUser = (
   }
   const checkDuplicate = () => {
     let duplicatedUser = user.rooms.filter(room => 
-      room[searchBy as keyof RoomUser] === searchText.toLowerCase())
+      room[searchBy as keyof (RoomUser | GroupUser)] === searchText.toLowerCase())
 
     if (duplicatedUser.length > 0 ) {
       return true

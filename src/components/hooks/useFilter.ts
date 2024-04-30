@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { RoomUser } from "../../interfaces/RoomUser";
+import { GroupUser } from "../../interfaces/GroupUser";
 
 export const useFilter = (
   name: string,
-  users: RoomUser[]
+  users: (RoomUser | GroupUser)[]
 ) => {
-  const [filteredRooms, setFilteredRooms] = useState<RoomUser[]>(users)
+  const [filteredRooms, setFilteredRooms] = useState<(RoomUser | GroupUser)[]>(users)
 
   useEffect(() => {
     setFilteredRooms(users)

@@ -6,9 +6,10 @@ import CallRoom from './Call/CallRoom'
 import { useEffect, useRef } from 'react'
 import { socket } from '../../../socket/socket'
 import { ACTIONS } from '../../../modules/Actions'
+import { GroupUser } from '../../../interfaces/GroupUser'
 
 interface Props {
-  room: RoomUser
+  room: RoomUser | GroupUser
 }
 
 const ChatBar: React.FC<Props> = ({ room }) => {

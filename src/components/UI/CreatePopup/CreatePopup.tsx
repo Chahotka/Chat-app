@@ -62,9 +62,10 @@ const CreatePopup: React.FC<Props> = ({ setActive }) => {
         <div onClick={() => setActive(false)} className={cl.close}></div>
         <p className={cl.createText}>New Group</p>
         <ul className={cl.roomsList}>
-          {user.rooms.map(room => 
-            <Room key={room.id} room={room} addHandler={addHandler}/>
-          )}
+          {user.rooms.map(room => {
+            if (room.type === 'direct' && typeof room.id === 'string')
+              return <Room key={room.id} room={room} addHandler={addHandler}/>
+          })}
         </ul>
         <Button 
           text={'create group'}

@@ -4,14 +4,16 @@ import { Message } from "../../interfaces/Message"
 import { socket } from "../../socket/socket"
 import { useDateConverter } from "./useDateConverter"
 import { useAppSelector } from "../../app/hooks"
+import { GroupUser } from "../../interfaces/GroupUser"
 
 type LastMessage = {
   time: string
   userId: string
   message: string
+  name?: string
 }
 
-export const useMessages = (room: RoomUser | null) => {
+export const useMessages = (room: RoomUser | GroupUser | null) => {
   const activeRoom = useAppSelector(state => state.user.activeRoom)
   const [messages, setMessages] = useState<Message[]>([])
   const [lastMessage, setLastMessage] = useState<LastMessage>({time: '', userId: '', message: ''})

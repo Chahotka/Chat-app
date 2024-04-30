@@ -77,23 +77,41 @@ export const dbHandler = {
       })
     }
   },
-  getRooms: async (roomsId: {userId: string, roomId: string}[]) => {
-    const rooms: DocumentData[] = []
+  getRooms: async (rooms: {userId?: string, usersId?: string[], roomId: string}[]) => {
+    const roomsData: DocumentData[] = []
     const usersRef = db.collection('users_list')
-    
-    for (const element of roomsId) {
-      const userDoc = await usersRef.doc(element.userId).get()
-      const userData = userDoc.data()
 
-      if (typeof userData !== 'undefined') {
-        rooms.push({
+    for (let room of rooms) {
+      if (typeof room.userId === 'string') {
+        const userData = (await usersRef.doc(room.userId).get()).data()
+
+        roomsData.push({
+          type: 'direct',
           ...userData,
-          roomId: element.roomId
+          roomId: room.roomId
+        })
+      }
+
+      if (typeof room.usersId !== 'undefined') {
+        const groupUsers: DocumentData[] = []
+
+        for (let userId of room.usersId) {
+          const userData = (await usersRef.doc(userId).get()).data()
+
+          if (typeof userData !== 'undefined') {
+            groupUsers.push(userData)
+          }
+        }
+
+        roomsData.push({
+          type: 'group',
+          users: groupUsers,
+          roomId: room.roomId
         })
       }
     }
 
-    return rooms
+    return roomsData
   },
   sendMessage: async (messageObject: Message) => {
     const roomRef = db.collection('rooms_messages').doc(messageObject.roomId)

@@ -29,7 +29,7 @@ const Rooms: React.FC<Props> = ({ width, setActive }) => {
       {rooms.length > 0 &&
         <ul className={cl.roomsList}>
           {filteredRooms.map(room =>
-            <RoomsList room={room} key={room.id} />)}
+            <RoomsList room={room} key={room.roomId} />)}
         </ul>
       }
     </div>

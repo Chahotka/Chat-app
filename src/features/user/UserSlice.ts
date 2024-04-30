@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RoomUser } from "../../interfaces/RoomUser";
+import { GroupUser } from "../../interfaces/GroupUser";
 
 export interface UserState {
   id: string
@@ -7,8 +8,8 @@ export interface UserState {
   email: string
   avatar: string | null
   password: string
-  activeRoom: RoomUser | null
-  rooms: RoomUser[]
+  activeRoom: RoomUser | GroupUser | null
+  rooms: (RoomUser | GroupUser)[]
 }
 
 const initialState: UserState = {
@@ -44,13 +45,13 @@ const userSlice = createSlice({
     changePassword: (state, action: PayloadAction<string>) => {
       state.password = action.payload
     },
-    addRoom: (state, action: PayloadAction<RoomUser>) => {
+    addRoom: (state, action: PayloadAction<RoomUser | GroupUser>) => {
       state.rooms = [...state.rooms, action.payload]
     },
     addRooms: (state, action: PayloadAction<RoomUser[]>) => {
       state.rooms = action.payload
     },
-    setActiveRoom: (state, action: PayloadAction<RoomUser | null>) => {
+    setActiveRoom: (state, action: PayloadAction<RoomUser | GroupUser | null>) => {
       if (action.payload) {
         state.activeRoom = action.payload
       } else {
