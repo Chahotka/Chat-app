@@ -6,37 +6,18 @@ import Search from './Search'
 
 interface Props {
   sidebarActive: boolean
+  setShowGroup: React.Dispatch<React.SetStateAction<boolean>>
+  setShowDirect: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const SidebarOptions: React.FC<Props> = ({ sidebarActive }) => {
-  const [addPopup, setAddPopup] = useState(true)
-  const [groupPopup, setGroupPopup] = useState(false)
-
-  useEffect(() => {
-    if (!sidebarActive) {
-      setAddPopup(false)
-      setGroupPopup(false)
-    }
-  }, [sidebarActive])
+const SidebarOptions: React.FC<Props> = ({ sidebarActive, setShowGroup, setShowDirect }) => {
 
   return (
     <ul className={cl.options}>
-      <SidebarOption text={'add user'} action={() => setAddPopup(true)} />
-      <SidebarOption text={'new group'} action={() => setGroupPopup(true)} />
+      <SidebarOption text={'add user'} action={() => setShowDirect(true)} />
+      <SidebarOption text={'new group'} action={() => setShowGroup(true)} />
       <SidebarOption text={'user settings'} />
       <SidebarOption text={'ne ebu poka'} />
-      {
-        addPopup &&
-        <Search
-          setActive={setAddPopup}
-        />
-      }
-      {
-        groupPopup &&
-        <CreatePopup 
-          setActive={setGroupPopup}
-        />
-      }
     </ul>
   )
 }

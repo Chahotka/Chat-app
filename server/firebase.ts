@@ -40,7 +40,7 @@ export const dbHandler = {
     if (snapshot.empty) {
       return {
         status: 'error',
-        res: `No such user with this ${searchBy}: ${searchText}`
+        res: `No such user with this ${searchBy}`
       }
     } else {
       return {
@@ -134,7 +134,7 @@ export const dbHandler = {
       return data.messages
     }
   },
-  createGroup: async (groupId: string, creator: string, selectedUsers: string[]) => {
+  createGroup: async (groupName: string, groupId: string, creator: string, selectedUsers: string[]) => {
     const usersRef = db.collection('users_list')
     const creatorRef = db.collection('users_list').doc(creator)
     const groupRef = db.collection('rooms-messages').doc(groupId)
@@ -163,7 +163,9 @@ export const dbHandler = {
 
     await db.collection('rooms_messages').doc(groupId).set({
       type: 'group',
-      users: [creator, ...selectedUsers],
+      name: groupName,
+      creator,
+      usersId: [creator, ...selectedUsers],
       messages: [],
       roomId: groupId
     })

@@ -9,9 +9,10 @@ import { useMessages } from '../hooks/useMessages'
 import { Message } from '../../interfaces/Message'
 import { useDateConverter } from '../hooks/useDateConverter'
 import { socket } from '../../socket/socket'
+import { GroupUser } from '../../interfaces/GroupUser'
 
 interface Props {
-  room: RoomUser
+  room: (RoomUser | GroupUser)
 }
 
 const RoomsList: React.FC<Props> = ({ room }) => {
@@ -32,6 +33,7 @@ const RoomsList: React.FC<Props> = ({ room }) => {
       socket.off('message sended', onMessage)
     }
   }, [messages])
+
 
   return (
     <li onClick={() => dispatch(setActiveRoom(room))} className={cl.room}>

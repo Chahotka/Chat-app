@@ -1,5 +1,5 @@
 .selectWrapper {
-  min-width: max-content;
+  min-width: 120px;
   padding: 10px 30px 10px 10px;
   background: #000;
   position: relative;
@@ -7,11 +7,14 @@
 }
 
 .selectedOption {
+  display: flex;
 }
 
-.selectedOption span {
+.selectedOption p {
+  width: 100%;
   font-size: 14px;
   font-weight: 600;
+  text-align: center;
   text-transform: uppercase;
 }
 

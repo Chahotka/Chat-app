@@ -9,9 +9,11 @@ interface Props {
   setName: React.Dispatch<React.SetStateAction<string>>
   active: boolean
   setActive: React.Dispatch<React.SetStateAction<boolean>>
+  setShowGroup: React.Dispatch<React.SetStateAction<boolean>>
+  setShowDirect: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const Sidebar: React.FC<Props> = ({ name, setName, active, setActive }) => {
+const Sidebar: React.FC<Props> = ({ name, setName, active, setActive, setShowGroup, setShowDirect }) => {
   return (
     <div className={cl.sidebar}>
       <div
@@ -25,9 +27,13 @@ const Sidebar: React.FC<Props> = ({ name, setName, active, setActive }) => {
         onChange={(e) => setName(e.target.value)}
         className={cl.filterInput}
       />
-      <SidebarMenu active={active} setActive={setActive} />
+      <SidebarMenu 
+        active={active}
+        setActive={setActive} 
+        setShowGroup={setShowGroup}
+        setShowDirect={setShowDirect}
+      />
     </div>
   )
 }
-// Доебать z-indeksbl
 export default Sidebar

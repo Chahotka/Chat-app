@@ -64,9 +64,9 @@ app.post('/sign-in', async (req: Request, res: Response) => {
   }
 })
 app.post('/add-user', async (req: Request, res: Response) => {
-  const userNameOrId = req.body.searchText.toLowerCase()
+  const userEmailOrId = req.body.searchText.toLowerCase()
   const searchBy = req.body.searchBy
-  const userResponse = await dbHandler.searchUser(userNameOrId, searchBy)
+  const userResponse = await dbHandler.searchUser(userEmailOrId, searchBy)
 
   if (typeof userResponse.res === 'object') {
     const roomId = v4()
@@ -94,6 +94,7 @@ app.post('/get-rooms', async (req: Request, res: Response) => {
 
   usersList.forEach(user => {
     rooms.push({
+      type: user.type,
       id: user.id,
       name: user.name,
       email: user.email,
@@ -106,10 +107,13 @@ app.post('/get-rooms', async (req: Request, res: Response) => {
 })
 app.post('/create-group', async (req: Request, res: Response) => {
   await dbHandler.createGroup(
+    req.body.groupName,
     req.body.groupId,
     req.body.creator,
     req.body.selectedUsers
   )
+
+  res.send()
 })
 
 app.listen(5000, () => {
