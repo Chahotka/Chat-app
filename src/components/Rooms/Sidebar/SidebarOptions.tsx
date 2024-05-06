@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react';
 import cl from '../../../styles/sidebar.module.css'
 import SidebarOption from './SidebarOption'
-import CreatePopup from '../../UI/CreatePopup/CreatePopup'
-import Search from './Search'
 
 interface Props {
   sidebarActive: boolean

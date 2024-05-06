@@ -48,7 +48,7 @@ const userSlice = createSlice({
     addRoom: (state, action: PayloadAction<RoomUser | GroupUser>) => {
       state.rooms = [...state.rooms, action.payload]
     },
-    addRooms: (state, action: PayloadAction<RoomUser[]>) => {
+    addRooms: (state, action: PayloadAction<(RoomUser | GroupUser)[]>) => {
       state.rooms = action.payload
     },
     setActiveRoom: (state, action: PayloadAction<RoomUser | GroupUser | null>) => {

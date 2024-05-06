@@ -93,20 +93,27 @@ export const dbHandler = {
       }
 
       if (typeof room.usersId !== 'undefined') {
+        const group = (await db.collection('rooms_messages').doc(room.roomId).get()).data()
         const groupUsers: DocumentData[] = []
 
         for (let userId of room.usersId) {
-          const userData = (await usersRef.doc(userId).get()).data()
-
-          if (typeof userData !== 'undefined') {
-            groupUsers.push(userData)
+          const userDoc: DocumentData = await usersRef.doc(userId).get()
+          
+          if (typeof userDoc !== 'undefined') {
+            const docData = userDoc.data()
+            
+            groupUsers.push({
+              id: docData.id,
+              name: docData.name,
+              email: docData.email,
+              avatar: docData.avatar
+            })
           }
         }
-
+        
         roomsData.push({
-          type: 'group',
-          users: groupUsers,
-          roomId: room.roomId
+          ...group,
+          users: groupUsers
         })
       }
     }
@@ -137,7 +144,6 @@ export const dbHandler = {
   createGroup: async (groupName: string, groupId: string, creator: string, selectedUsers: string[]) => {
     const usersRef = db.collection('users_list')
     const creatorRef = db.collection('users_list').doc(creator)
-    const groupRef = db.collection('rooms-messages').doc(groupId)
 
     const creatorData = (await creatorRef.get()).data()
 
@@ -145,6 +151,8 @@ export const dbHandler = {
       const creatorRooms = creatorData.rooms || []
 
       await creatorRef.update({rooms: [...creatorRooms, {roomId: groupId, usersId: selectedUsers}]})
+    } else {
+      return {status: 'error', res: 'Unable to get user data'}
     }
 
     for (let userId of selectedUsers) {
@@ -158,6 +166,8 @@ export const dbHandler = {
         const userRooms = userData.rooms || []
 
         await userRef.update({rooms: [...userRooms, {roomId: groupId, usersId: [creator, ...filteredUsers]}]})
+      } else {
+        return {status: 'error', res: 'Unable to get data of users'}
       }
     }
 
@@ -169,6 +179,18 @@ export const dbHandler = {
       messages: [],
       roomId: groupId
     })
+
+    return {
+      status: 'success',
+      res: {
+        type: 'group',
+        name: groupName,
+        creator,
+        usersId: [creator, ...selectedUsers],
+        messages: [],
+        roomId: groupId
+      }
+    }
   }
 }
 

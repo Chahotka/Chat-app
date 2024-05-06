@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import cl from '../styles/rooms.module.css'
 import RoomsList from './Rooms/RoomsList'
 import Sidebar from './Rooms/Sidebar'
 import { useFilter } from './hooks/useFilter'
 import { useRooms } from './hooks/useRooms'
 import { useEscape } from './hooks/useEscape'
-import CreatePopup from './UI/CreatePopup/CreatePopup'
 import AddDirectChat from './Rooms/Sidebar/SidebarOptions/AddDirectChat'
+import AddGroupChat from './Rooms/Sidebar/SidebarOptions/AddGroupChat'
 
 interface Props {
   width: number
@@ -20,7 +20,7 @@ const Rooms: React.FC<Props> = ({ width, setActive }) => {
 
   const { rooms } = useRooms()
   const { filteredRooms } = useFilter(name, rooms)
-  const { sidebarActive, setSidebarActive } = useEscape()
+  const { sidebarActive, setSidebarActive } = useEscape(showGroup, showDirect, setShowGroup, setShowDirect)
 
 
   return (
@@ -33,7 +33,8 @@ const Rooms: React.FC<Props> = ({ width, setActive }) => {
         setShowGroup={setShowGroup}
         setShowDirect={setShowDirect}
       />
-      { showDirect && <AddDirectChat setActive={setShowDirect}/>}
+      { showGroup && <AddGroupChat setActive={setShowGroup} /> }
+      { showDirect && <AddDirectChat setActive={setShowDirect}/> }
       {rooms.length > 0 &&
         <ul className={cl.roomsList}>
           {filteredRooms.map(room =>

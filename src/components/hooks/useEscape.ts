@@ -3,7 +3,18 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { setActiveRoom } from "../../features/user/UserSlice"
 import { socket } from "../../socket/socket"
 
-export const useEscape = () => {
+type Hook = (
+  showGroup: boolean,
+  showDirect: boolean,
+  setShowGroup: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowDirect: React.Dispatch<React.SetStateAction<boolean>>
+
+) => {
+  sidebarActive: boolean
+  setSidebarActive: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const useEscape: Hook = (showGroup, showDirect, setShowGroup, setShowDirect) => {
   const dispatch = useAppDispatch()
   const [sidebarActive, setSidebarActive] = useState(false)
   const activeRoom = useAppSelector(state => state.user.activeRoom)
@@ -13,7 +24,11 @@ export const useEscape = () => {
       return
     }
 
-    if (sidebarActive) {
+    if (showDirect) {
+      setShowDirect(false)
+    } else if (showGroup) {
+      setShowGroup(false)
+    } else if (sidebarActive) {
       setSidebarActive(false)
     } else if (activeRoom) {
       socket.emit('leave', activeRoom.roomId)
@@ -28,7 +43,7 @@ export const useEscape = () => {
       window.removeEventListener('keydown', onEscape)
 
     }
-  }, [sidebarActive, activeRoom])
+  }, [sidebarActive, activeRoom, showDirect, showGroup])
 
   return { sidebarActive, setSidebarActive }
 }

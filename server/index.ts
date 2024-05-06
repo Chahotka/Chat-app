@@ -93,27 +93,34 @@ app.post('/get-rooms', async (req: Request, res: Response) => {
   const rooms: DocumentData[] = []
 
   usersList.forEach(user => {
-    rooms.push({
-      type: user.type,
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar,
-      roomId: user.roomId
-    })
+    if (user.type === 'direct') {
+      rooms.push({
+        type: user.type,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        roomId: user.roomId
+      })
+    } else if (user.type === 'group') {
+      rooms.push({
+        type: user.type,
+        name: user.name,
+        creator: user.creator,
+        users: user.users,
+        roomId: user.roomId,
+      })
+    }
   })
 
   res.send(rooms)
 })
 app.post('/create-group', async (req: Request, res: Response) => {
-  await dbHandler.createGroup(
-    req.body.groupName,
-    req.body.groupId,
-    req.body.creator,
-    req.body.selectedUsers
-  )
+  const {groupId, creatorId, groupName, selectedUsers } = req.body
 
-  res.send()
+  const response = await dbHandler.createGroup(groupName, groupId, creatorId, selectedUsers)
+
+  res.send(response)
 })
 
 app.listen(5000, () => {
