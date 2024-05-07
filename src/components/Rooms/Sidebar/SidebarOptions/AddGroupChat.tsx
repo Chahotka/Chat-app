@@ -23,7 +23,7 @@ const AddGroupChat: React.FC<Props> = ({ setActive }) => {
 
   const [groupName, setGroupName] = useState('')
   const [filterText, setFilterText] = useState<string>('')
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+  const [selectedUsers, setSelectedUsers] = useState<RoomUser[]>([])
 
   const { filteredRooms } = useFilter(filterText, userState.rooms)
   const { fetching, loading, error, showError } = useAddGroup(userState.id, selectedUsers, groupName, setActive)

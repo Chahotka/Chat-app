@@ -3,11 +3,12 @@ import { useFetch } from "./useFetch"
 import { v4 } from "uuid"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { addRoom } from "../../features/user/UserSlice"
+import { RoomUser } from "../../interfaces/RoomUser"
 
 type Return = {fetching: () => Promise<void>, loading: boolean, error: string, showError: boolean}
 type Hook = (
   creatorId: string,
-  selectedUsers: string[],
+  selectedUsers: RoomUser[],
   groupName: string, 
   setActive: React.Dispatch<React.SetStateAction<boolean>>
 ) => Return
@@ -51,7 +52,7 @@ export const useAddGroup: Hook = (creatorId, selectedUsers, groupName, setActive
         groupId: v4(),
         creatorId,
         groupName,
-        selectedUsers
+        selectedUsers: selectedUsers.map(user => user.id)
       })
     })
     const data = await response.json()
@@ -61,7 +62,11 @@ export const useAddGroup: Hook = (creatorId, selectedUsers, groupName, setActive
       setShowError(true)
       return
     } else if (data.status === 'success') {
-      dispatch(addRoom(data.res))
+      dispatch(addRoom({
+        ...data.res,
+        users: selectedUsers
+      }))
+
 
       if (typeof storageRooms === 'string') {
         const rooms = JSON.parse(storageRooms)

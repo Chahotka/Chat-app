@@ -4,7 +4,7 @@ import { RoomUser } from '../../../../interfaces/RoomUser'
 
 interface Props {
   room: RoomUser
-  setSelected: React.Dispatch<React.SetStateAction<string[]>>
+  setSelected: React.Dispatch<React.SetStateAction<RoomUser[]>>
 }
 
 const RoomSelect: React.FC<Props> = ({ room, setSelected }) => {
@@ -13,10 +13,10 @@ const RoomSelect: React.FC<Props> = ({ room, setSelected }) => {
   const selectHandler = () => {
     if (!isSelected) {
       setIsSelected(true)
-      setSelected(prev => [...prev, room.id])
+      setSelected(prev => [...prev, room])
     } else {
       setIsSelected(false)
-      setSelected(prev => prev.filter(roomName => roomName !== room.id))
+      setSelected(prev => prev.filter(selectedRoom => selectedRoom.id !== room.id))
     }
   }
 
