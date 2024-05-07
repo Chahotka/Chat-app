@@ -2,22 +2,31 @@ import React from 'react'
 import cl from '../../styles/room-info.module.css'
 import { useAppSelector } from '../../app/hooks'
 import defImg from './Mogged.png'
+import DirectInfo from './RoomInfo/DirectInfo'
+import GroupInfo from './RoomInfo/GroupInfo'
 
 const RoomInfo: React.FC = () => {
-  const userInfo = useAppSelector(state => state.user.activeRoom)
+  const room = useAppSelector(state => state.user.activeRoom)
 
-  if (userInfo === null) {
-    return <div></div>
+  if (!room) {
+    return <></>
   }
 
   return (
     <div className={cl.info}>
-      <div className={cl.avatar}>
-        <img src={userInfo.avatar || defImg} alt="Room avatar" />
+      <div className={cl.avatarWrapper}>
+        <img 
+          className={cl.avatar} 
+          src={defImg || room.avatar} 
+          alt="avatar" 
+        />
       </div>
-      <div className={cl.textInfo}>
-        <p className={cl.name}>{userInfo.name}</p>
-        <p className={cl.email}>{userInfo.email}</p>
+      <div className={cl.roomInfo}>
+        <p className={cl.roomName}>{ room.name }</p>
+        { room.type === 'direct'
+          ? <DirectInfo room={room}/>
+          : <GroupInfo room={room}/>
+        }
       </div>
     </div>
   )
