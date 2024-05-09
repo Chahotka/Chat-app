@@ -6,16 +6,18 @@ import { useAppSelector } from '../../app/hooks'
 import { useMessages } from '../hooks/useMessages'
 import ChatBar from './Chat/ChatBar'
 
+interface Props {
+  askPermission: () => void
+}
 
-
-const Chat: React.FC = () => {
+const Chat: React.FC<Props> = ({ askPermission }) => {
   const activeRoom = useAppSelector(state => state.user.activeRoom)
   const { messages, setMessages } = useMessages(activeRoom)
 
 
   return (
     <div className={cl.chat}>
-      { activeRoom && <ChatBar room={activeRoom} /> }
+      { activeRoom && <ChatBar room={activeRoom} askPermission={askPermission} /> }
       <Messages  messages={messages} />
       <MessageSender setMessages={setMessages} />
     </div>

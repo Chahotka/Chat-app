@@ -15,7 +15,7 @@ type AddPeer = { peerId: string, createOffer: boolean }
 type iceCandidate = { peerId: string, iceCandidate: RTCIceCandidate }
 type sessionDescription = { peerId: string, sessionDescription: RTCSessionDescription }
 
-export const useWebRTC = (roomId: string) => {
+export const useWebRTC = (roomId: string | undefined) => {
   const user = useAppSelector(state => state.user)
 
   const { state: clients, updateState: updateClients } = useStateWithCallback([])

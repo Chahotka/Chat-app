@@ -17,8 +17,8 @@ interface Props {
 }
 
 const InCall: React.FC<Props> = (
-  { 
-    clients, 
+  {
+    clients,
     isSharing,
     setIsSharing,
     localStream,
@@ -30,10 +30,10 @@ const InCall: React.FC<Props> = (
 ) => {
   return (
     <div className={cl.inCall}>
-      <Clients 
-        clients={clients} 
-        provideMedia={provideMedia} 
-        isSharing={isSharing} 
+      <Clients
+        clients={clients}
+        provideMedia={provideMedia}
+        isSharing={isSharing}
         setIsSharing={setIsSharing}
         localStream={localStream}
         mediaElements={mediaElements}
@@ -41,7 +41,7 @@ const InCall: React.FC<Props> = (
       />
       <div className={cl.receivingOptions}>
         <div onClick={stopCall} className={[cl.receivingOption, cl.red].join(' ')}>
-          <img src={phone} alt='end call'/>
+          <img src={phone} alt='end call' />
         </div>
       </div>
     </div>
