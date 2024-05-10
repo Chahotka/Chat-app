@@ -1,6 +1,8 @@
 export const 
 ACTIONS = {
   CALL: 'call',
+  JOIN_GROUP: 'join-group',
+  SHARE_GROUP: 'share-group',
   STOP_CALL: 'stop-call',
   ADD_PEER: 'add-peer',
   REMOVE_PEER: 'remove-peer',

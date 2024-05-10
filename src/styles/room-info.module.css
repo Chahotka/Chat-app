@@ -18,6 +18,41 @@
   border-radius: 20px;
 }
 
+.channels {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.channelsList {
+  padding: 0 15px;
+  margin-top: 10px;
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.channelName {
+
+}
+
+.channelUsers {
+  margin-top: 15px;
+  padding: 0 15px;
+  gap: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.channelUser {
+  gap: 10px;
+  display: flex;
+}
+
+.channelAvatar {
+  width: 30px;
+  border-radius: 50%;
+}
+
 .avatarWrapper {
   margin: 30px auto 0 auto;
   width: 170px;
