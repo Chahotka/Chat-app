@@ -1,14 +1,16 @@
 import cl from '../../../styles/chat-bar.module.css'
 import callImg from '../../../images/phone.svg'
+import plusImg from '../../../images/plus.svg'
 import { RoomUser } from '../../../interfaces/RoomUser'
 import { GroupUser } from '../../../interfaces/GroupUser'
 
 interface Props {
   room: RoomUser | GroupUser
+  startCall: () => void
   askPermission: () => void
 }
 
-const ChatBar: React.FC<Props> = ({ room, askPermission }) => {
+const ChatBar: React.FC<Props> = ({ room, startCall, askPermission }) => {
   return (
     <div className={cl.bar}>
       <div className={cl.info}>
@@ -17,10 +19,14 @@ const ChatBar: React.FC<Props> = ({ room, askPermission }) => {
       </div>
       <div className={cl.actions}>
         <img
-          className={cl.call}
-          src={callImg}
           alt="Make call"
-          onClick={askPermission}
+          className={cl.call}
+          onClick={room.type === 'direct' ? askPermission : startCall}
+          src={room.type === 'direct' ? callImg : plusImg}
+          title={room.type === 'direct'
+            ? `Call ${room.name}`
+            : 'Start Voice Channel'
+          }
         />
       </div>
     </div>

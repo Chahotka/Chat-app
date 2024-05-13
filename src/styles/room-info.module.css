@@ -18,36 +18,6 @@
   border-radius: 20px;
 }
 
-.channels {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.channelsList {
-  padding: 0 15px;
-  margin-top: 10px;
-  gap: 10px;
-  display: flex;
-  flex-direction: column;
-}
-
-.channelName {
-
-}
-
-.channelUsers {
-  margin-top: 15px;
-  padding: 0 15px;
-  gap: 15px;
-  display: flex;
-  flex-direction: column;
-}
-
-.channelUser {
-  gap: 10px;
-  display: flex;
-}
-
 .channelAvatar {
   width: 30px;
   border-radius: 50%;
@@ -89,13 +59,57 @@
 .groupInfo {
 }
 
-.members {
+.channels {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.channelsList {
+  padding: 20px 15px;
   margin-top: 20px;
+  gap: 30px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ffffff1a;
+  border-left: none;
+  border-right: none;
+}
+
+.channelNameBox {
+  gap: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.channelName {
+
+}
+
+.joinChannel {
+  width: 20px;
+  cursor: pointer;
+}
+
+.channelUsers {
+  margin-top: 15px;
+  padding: 0 15px;
+  gap: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.channelUser {
+  gap: 10px;
+  display: flex;
+}
+
+.members {
+  margin-top: 40px;
   text-align: center;
 }
 
 .usersList {
-  margin-top: 20px;
+  margin: 20px 0;
   padding: 0 10px;
   width: 100%;
   height: 100%;

@@ -7,6 +7,8 @@ import { useAppSelector } from "../../app/hooks"
 
 export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 
+export type Channel = {channelId: string, name: string, users: {name: string, id: string, avatar: string | null}[]}
+
 export type CallState = 'calling' | 'receiving' | 'disconnecting' | 'inCall' | 'idle'
 export type CallPermission = { callerName: string, callerId: string }
 export type ProvideRef = (id: string, node: HTMLVideoElement | null) => void
@@ -15,7 +17,7 @@ type AddPeer = { peerId: string, createOffer: boolean }
 type iceCandidate = { peerId: string, iceCandidate: RTCIceCandidate }
 type sessionDescription = { peerId: string, sessionDescription: RTCSessionDescription }
 
-export const useWebRTC = (roomId: string | undefined) => {
+export const useWebRTC = (roomId: string | undefined, type: string | undefined) => {
   const user = useAppSelector(state => state.user)
 
   const { state: clients, updateState: updateClients } = useStateWithCallback([])
@@ -23,6 +25,42 @@ export const useWebRTC = (roomId: string | undefined) => {
   const [caller, setCaller] = useState<CallPermission>()
   const [callState, setCallState] = useState<CallState>('idle')
   const [isSharing, setIsSharing] = useState(false)
+
+
+  const [groupChannels, setGroupChannels] = useState<Channel[]>([
+    {
+      name: `Shokolatier's channel`,
+      channelId: '120-3-01890-31234-0891234-0981234089-1234',
+      users: [
+        {
+          id: '07629667-96bc-4aa4-bdf8-79dadfa074ce',
+          name: 'Shokolatier',
+          avatar: null
+        },
+        {
+          id: 'ad370b55-e120-4aef-83f5-c1709728ed28',
+          name: 'Mojisola',
+          avatar: null
+        },
+      ]
+    },
+    {
+      name: `Elipse's channel`,
+      channelId: '123908390u-0-90234-9012340-u93142',
+      users: [
+        {
+          id: '1730fa37-6eca-4ffe-a57b-f74fe04bafe6',
+          name: 'Elipse',
+          avatar: null
+        },
+        {
+          id: '3f914e9f-084f-420d-a56a-3402182d7992',
+          name: 'Magomrak',
+          avatar: null
+        },
+      ]
+    }
+  ])
 
   const localCameraStream = useRef<MediaStream>()
   const localScreenStream = useRef<MediaStream>()
@@ -136,9 +174,7 @@ export const useWebRTC = (roomId: string | undefined) => {
 
   const provideMediaRef: ProvideRef = (id, node) => {
     if (node) {
-      console.log('PROVIDING REF FOR: ', id, ' ', node)
       peerMediaElements.current[id] = node
-      console.log(peerMediaElements.current)
     }
   }
 
@@ -150,6 +186,9 @@ export const useWebRTC = (roomId: string | undefined) => {
       setCallState('receiving')
     }
     const onAddPeer = async ({ peerId, createOffer }: AddPeer) => {
+      if (peerId === socket.id) {
+        return
+      }
       if (peerId in peerConnections.current) {
         return console.warn('ALREADY ADDED THIS PEER')
       }
@@ -161,7 +200,8 @@ export const useWebRTC = (roomId: string | undefined) => {
 
       localCameraStream.current?.getTracks().forEach(track => {
         if (localCameraStream.current) {
-          peerMediaSenders.current.push(peerConnections.current[peerId].addTrack(track, localCameraStream.current))
+          peerMediaSenders.current.push(peerConnections.current[peerId]
+            .addTrack(track, localCameraStream.current))
         }
       })
 
@@ -263,6 +303,7 @@ export const useWebRTC = (roomId: string | undefined) => {
     setCallState,
     isSharing,
     setIsSharing,
+    groupChannels,
     localCameraStream,
     peerMediaElements,
     startCall,

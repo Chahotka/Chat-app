@@ -1,6 +1,6 @@
 import { Message } from "./Message"
 
-type User = {
+export type User = {
   role?: 'creator'
   id: string
   name: string

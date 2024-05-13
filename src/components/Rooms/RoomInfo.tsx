@@ -4,8 +4,13 @@ import { useAppSelector } from '../../app/hooks'
 import defImg from './Mogged.png'
 import DirectInfo from './RoomInfo/DirectInfo'
 import GroupInfo from './RoomInfo/GroupInfo'
+import { Channel } from '../hooks/useWebRTC'
 
-const RoomInfo: React.FC = () => {
+interface Props {
+  groupChannels: Channel[]
+}
+
+const RoomInfo: React.FC<Props> = ({ groupChannels }) => {
   const room = useAppSelector(state => state.user.activeRoom)
 
   if (!room) {
@@ -25,7 +30,7 @@ const RoomInfo: React.FC = () => {
         <p className={cl.roomName}>{ room.name }</p>
         { room.type === 'direct'
           ? <DirectInfo room={room}/>
-          : <GroupInfo room={room}/>
+          : <GroupInfo room={room} channels={groupChannels}/>
         }
       </div>
     </div>

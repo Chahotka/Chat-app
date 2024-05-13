@@ -18,6 +18,7 @@ const Room: React.FC = () => {
     callState,
     isSharing,
     setIsSharing,
+    groupChannels,
     localCameraStream,
     peerMediaElements,
     startCall,
@@ -25,19 +26,24 @@ const Room: React.FC = () => {
     shareScreen,
     askPermission,
     provideMediaRef
-  } = useWebRTC(roomId)
+  } = useWebRTC(roomId, room?.type)
 
   useEffect(() => {
     if (!room) {
       navigate('/')
     }
-    
   }, [room])
+
+  useEffect(() => {
+    return () => {
+      stopCall()
+    }
+  }, [])
 
   return (
     <div className={cl.room}>
-      <Chat askPermission={askPermission}/>
-      <RoomInfo />
+      <Chat startCall={startCall} askPermission={askPermission}/>
+      <RoomInfo groupChannels={groupChannels} />
       {
         callState !== 'idle' &&
         <CallRoom
