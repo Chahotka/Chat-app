@@ -19,18 +19,17 @@ interface Props {
 }
 
 const ClientOptions: React.FC<Props> = (
-  { 
-    clientId, 
-    muted, 
-    setMuted, 
-    deafen, 
+  {
+    clientId,
+    muted,
+    setMuted,
+    deafen,
     setDeafen,
     isSharing,
     setIsSharing,
     localStream,
     mediaElements,
     shareScreen,
-    // Перенести все доконца
   }
 ) => {
   const optionsHandler = (type: 'mute' | 'deaf' | 'share') => {
@@ -69,29 +68,29 @@ const ClientOptions: React.FC<Props> = (
 
   return (
     <ul className={cl.clientOptions}>
-      <li 
+      <li
         className={muted ? [cl.clientOption, cl.active].join(' ') : cl.clientOption}
         onClick={() => optionsHandler('mute')}
       >
-        <img src={mute}/>
-        <p className={cl.clientOptionText}>{ muted ? 'Unmute' : 'Mute' }</p>
+        <img src={mute} />
+        <p className={cl.clientOptionText}>{muted ? 'Unmute' : 'Mute'}</p>
       </li>
-      { clientId === 'LOCAL_VIDEO' &&
-        <li 
+      {clientId === 'LOCAL_VIDEO' &&
+        <li
           className={deafen ? [cl.clientOption, cl.active].join(' ') : cl.clientOption}
           onClick={() => optionsHandler('deaf')}
         >
-          <img src={deaf}/>
-          <p className={cl.clientOptionText}>{ deafen ? 'Undeafen' : 'deafen' }</p>
+          <img src={deaf} />
+          <p className={cl.clientOptionText}>{deafen ? 'Undeafen' : 'deafen'}</p>
         </li>
       }
-      { clientId === 'LOCAL_VIDEO' &&
-        <li 
+      {clientId === 'LOCAL_VIDEO' &&
+        <li
           className={isSharing ? [cl.clientOption, cl.active].join(' ') : cl.clientOption}
           onClick={() => optionsHandler('share')}
         >
-          <img src={screen}/>
-          <p className={cl.clientOptionText}>{ isSharing ? 'Share Screen' : 'Stop Sharing' }</p>
+          <img src={screen} />
+          <p className={cl.clientOptionText}>{isSharing ? 'Share Screen' : 'Stop Sharing'}</p>
         </li>
       }
     </ul>

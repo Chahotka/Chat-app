@@ -18,8 +18,8 @@ interface Props {
 
 const Client: React.FC<Props> = (
   {
-    clientId, 
-    deafen, 
+    clientId,
+    deafen,
     setDeafen,
     isSharing,
     setIsSharing,
@@ -33,7 +33,7 @@ const Client: React.FC<Props> = (
 
   return (
     <li className={cl.client}>
-      <video 
+      <video
         ref={instance => {
           provideMedia(clientId, instance)
         }}
@@ -42,8 +42,8 @@ const Client: React.FC<Props> = (
         className={cl.clientVideo}
         title={clientId}
       />
-      <ClientOptions 
-        clientId={clientId} 
+      <ClientOptions
+        clientId={clientId}
         muted={muted}
         setMuted={setMuted}
         deafen={deafen}

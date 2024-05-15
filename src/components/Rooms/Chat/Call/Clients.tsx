@@ -15,10 +15,10 @@ interface Props {
 }
 
 const Clients: React.FC<Props> = (
-  { 
-    clients, 
-    isSharing, 
-    setIsSharing, 
+  {
+    clients,
+    isSharing,
+    setIsSharing,
     localStream,
     mediaElements,
     shareScreen,
@@ -29,9 +29,9 @@ const Clients: React.FC<Props> = (
 
   return (
     <ul className={cl.clients}>
-      {clients.map(clientId => 
-        <Client 
-          key={clientId} 
+      {clients.map(clientId =>
+        <Client
+          key={clientId}
           clientId={clientId}
           deafen={deafen}
           setDeafen={setDeafen}

@@ -8,6 +8,7 @@
   background: linear-gradient(rgb(21, 19, 41) 20%, rgb(17, 10, 10) 100%);
   overflow: hidden;
   transition: all 0.3s;
+  z-index: 3;
 }
 
 .callRoom.hidden {

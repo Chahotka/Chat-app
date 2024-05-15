@@ -22,7 +22,7 @@ interface Props {
 }
 
 const CallRoom: React.FC<Props> = (
-  { 
+  {
     clients,
     caller,
     callState,
@@ -40,14 +40,14 @@ const CallRoom: React.FC<Props> = (
 
   return (
     <div className={hidden ? [cl.callRoom, cl.hidden].join(' ') : cl.callRoom}>
-      {callState === 'calling' && 
+      {callState === 'calling' &&
         <Calling />
       }
-      { callState === 'receiving' && 
-        <Receiving caller={caller} stopCall={stopCall} startCall={startCall}/>
+      {callState === 'receiving' &&
+        <Receiving caller={caller} stopCall={stopCall} startCall={startCall} />
       }
-      { callState === 'inCall' &&
-        <InCall 
+      {callState === 'inCall' &&
+        <InCall
           clients={clients}
           isSharing={isSharing}
           setIsSharing={setIsSharing}
@@ -58,13 +58,13 @@ const CallRoom: React.FC<Props> = (
           provideMedia={provideMediaRef}
         />
       }
-      { callState === 'disconnecting' && <Disconnecting /> }
-      <div 
-        onClick={() => setHidden(prev => !prev)} 
-        className={ hidden
+      {callState === 'disconnecting' && <Disconnecting />}
+      <div
+        onClick={() => setHidden(prev => !prev)}
+        className={hidden
           ? [cl.roller, cl.hidden].join(' ')
           : cl.roller
-        } 
+        }
       />
     </div>
   )

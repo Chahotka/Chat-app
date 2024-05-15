@@ -10,7 +10,7 @@ interface Props {
   stopCall: () => void
 }
 
-const Receiving: React.FC<Props> = ({caller, stopCall, startCall}) => {
+const Receiving: React.FC<Props> = ({ caller, stopCall, startCall }) => {
   return (
     <div className={cl.receiving}>
       <video className={cl.receivingBg} autoPlay playsInline loop src={callBg}></video>
