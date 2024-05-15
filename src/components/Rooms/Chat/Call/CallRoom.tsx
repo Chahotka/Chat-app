@@ -17,6 +17,7 @@ interface Props {
   localStream: React.MutableRefObject<MediaStream | undefined>
   startCall: () => void
   stopCall: () => void
+  hideCam: (hide: boolean, socketId: string | undefined) => void
   provideMediaRef: ProvideRef
   shareScreen: (share: boolean) => void
 }
@@ -32,6 +33,7 @@ const CallRoom: React.FC<Props> = (
     mediaElements,
     startCall,
     stopCall,
+    hideCam,
     shareScreen,
     provideMediaRef,
   }
@@ -54,6 +56,7 @@ const CallRoom: React.FC<Props> = (
           localStream={localStream}
           mediaElements={mediaElements}
           stopCall={stopCall}
+          hideCam={hideCam}
           shareScreen={shareScreen}
           provideMedia={provideMediaRef}
         />

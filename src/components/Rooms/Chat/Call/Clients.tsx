@@ -10,6 +10,7 @@ interface Props {
   setIsSharing: React.Dispatch<React.SetStateAction<boolean>>
   mediaElements: React.MutableRefObject<MediaElements>
   localStream: React.MutableRefObject<MediaStream | undefined>
+  hideCam: (hide: boolean, socketId: string | undefined) => void
   shareScreen: (share: boolean) => void
   provideMedia: ProvideRef
 }
@@ -21,6 +22,7 @@ const Clients: React.FC<Props> = (
     setIsSharing,
     localStream,
     mediaElements,
+    hideCam,
     shareScreen,
     provideMedia
 
@@ -39,6 +41,7 @@ const Clients: React.FC<Props> = (
           setIsSharing={setIsSharing}
           localStream={localStream}
           mediaElements={mediaElements}
+          hideCam={hideCam}
           shareScreen={shareScreen}
           provideMedia={provideMedia}
         />

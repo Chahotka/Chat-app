@@ -172,6 +172,14 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
     setTimeout(() => setCallState('idle'), 1500)
   }
 
+  const hideCam = (hide: boolean, socketId: string | undefined) => {
+    socket.emit(ACTIONS.HIDE_CAM, {
+      hide,
+      clientId: socketId,
+      roomId
+    })
+  }
+
   const provideMediaRef: ProvideRef = (id, node) => {
     if (node) {
       peerMediaElements.current[id] = node
@@ -308,6 +316,7 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
     peerMediaElements,
     startCall,
     stopCall,
+    hideCam,
     shareScreen,
     askPermission,
     provideMediaRef,

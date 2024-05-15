@@ -1,8 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import cl from '../../../../styles/call-room.module.css'
+import defImg from '../../Mogged.png'
 import { ProvideRef } from '../../../hooks/useWebRTC'
 import ClientOptions from './ClientOptions'
 import { MediaElements } from '../../../../interfaces/MediaElements'
+import { ACTIONS } from '../../../../modules/Actions'
+import { socket } from '../../../../socket/socket'
 
 interface Props {
   clientId: string
@@ -13,6 +16,7 @@ interface Props {
   mediaElements: React.MutableRefObject<MediaElements>
   localStream: React.MutableRefObject<MediaStream | undefined>
   shareScreen: (share: boolean) => void
+  hideCam: (hide: boolean, socketId: string | undefined) => void
   provideMedia: ProvideRef
 }
 
@@ -26,10 +30,29 @@ const Client: React.FC<Props> = (
     localStream,
     mediaElements,
     shareScreen,
+    hideCam,
     provideMedia,
   }
 ) => {
   const [muted, setMuted] = useState(false)
+  const [shareCam, setShareCam] = useState(false)
+
+  useEffect(() => {
+    const handleCam = (
+      {hide, userId}:
+      {hide: boolean, userId: string}
+    ) => {
+      if (userId === clientId) {
+        setShareCam(hide)
+      }
+    }
+  
+    socket.on(ACTIONS.HANDLE_CAM, handleCam)
+
+    return () => {
+      socket.off(ACTIONS.HANDLE_CAM, handleCam)
+    }
+  }, [shareCam])
 
   return (
     <li className={cl.client}>
@@ -42,10 +65,17 @@ const Client: React.FC<Props> = (
         className={cl.clientVideo}
         title={clientId}
       />
+      <div className={shareCam ? cl.hideClient : [cl.hideClient, cl.hide].join(' ')}>
+        <img src={defImg} alt='user avatar' />
+      </div>
+
       <ClientOptions
         clientId={clientId}
         muted={muted}
         setMuted={setMuted}
+        shareCam={shareCam}
+        setShareCam={setShareCam}
+        hideCam={hideCam}
         deafen={deafen}
         setDeafen={setDeafen}
         isSharing={isSharing}

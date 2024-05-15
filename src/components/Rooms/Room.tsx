@@ -23,6 +23,7 @@ const Room: React.FC = () => {
     peerMediaElements,
     startCall,
     stopCall,
+    hideCam,
     shareScreen,
     askPermission,
     provideMediaRef
@@ -56,6 +57,7 @@ const Room: React.FC = () => {
           mediaElements={peerMediaElements}
           startCall={startCall}
           stopCall={stopCall}
+          hideCam={hideCam}
           shareScreen={shareScreen}
           provideMediaRef={provideMediaRef}
         />

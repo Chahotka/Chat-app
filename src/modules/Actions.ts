@@ -11,5 +11,7 @@ export const ACTIONS = {
   SESSION_DESCRIPTION: 'session-description',
   ASK_PERMISSION: 'ask-permission',
   CALL_PERMISSION: 'call-permission',
-  RELAY_PERMISSION: 'relay-permission'
+  RELAY_PERMISSION: 'relay-permission',
+  HIDE_CAM: 'hide-cam',
+  HANDLE_CAM: 'handle-cam'
 }

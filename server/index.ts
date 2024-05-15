@@ -129,6 +129,13 @@ app.listen(5000, () => {
 
 // SOCKET.IO
 
+const shareRoom = (roomId: string, userId: string) => {
+  io.to(roomId).emit(ACTIONS.SHARE_GROUP, {
+    roomId,
+    userId
+  })
+}
+
 io.on('connect', (socket) => {
   console.log('socket  connected')
   socketHandler.onConnect(socket)
@@ -163,17 +170,15 @@ io.on('connect', (socket) => {
     const clients = io.sockets.adapter.rooms.get(roomId) || []
     console.log('CLIENTS: ', clients)
     Array.from(clients).forEach(clientId => {
-      if (clientId !== socket.id) {
-        io.to(clientId).emit(ACTIONS.ADD_PEER, {
-          peerId: socket.id,
-          createOffer: true
-        })
+      io.to(clientId).emit(ACTIONS.ADD_PEER, {
+        peerId: socket.id,
+        createOffer: true
+      })
 
-        socket.emit(ACTIONS.ADD_PEER, {
-          peerId: clientId,
-          createOffer: false
-        })
-      }
+      socket.emit(ACTIONS.ADD_PEER, {
+        peerId: clientId,
+        createOffer: false
+      })
     })
   })
   socket.on(ACTIONS.RELAY_ICE, ({ peerId, iceCandidate}) => {
@@ -188,6 +193,14 @@ io.on('connect', (socket) => {
     io.to(peerId).emit(ACTIONS.SESSION_DESCRIPTION, {
       peerId: socket.id,
       sessionDescription
+    })
+  })
+  socket.on(ACTIONS.HIDE_CAM, ({ hide, clientId, roomId }) => {
+    console.log('suka cam')
+
+    io.to(roomId).emit(ACTIONS.HANDLE_CAM, {
+      hide,
+      userId: clientId
     })
   })
 
