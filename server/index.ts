@@ -129,7 +129,7 @@ app.listen(5000, () => {
 
 // SOCKET.IO
 
-const shareRoom = (roomId: string, userId: string) => {
+const shareChannel = (roomId: string, userId: string) => {
   io.to(roomId).emit(ACTIONS.SHARE_GROUP, {
     roomId,
     userId
@@ -204,29 +204,31 @@ io.on('connect', (socket) => {
     })
   })
 
-  const leaveRoom = () => {
-    console.log('peer disconnected')
-    const { rooms } = socket
-
-    Array.from(rooms).forEach(roomId => {
+  const leaveRoom = (roomId: string | undefined) => {
+    if (roomId) {
       const clients = io.sockets.adapter.rooms.get(roomId) || []
-      console.log(clients)
-
+  
       Array.from(clients).forEach(clientId => {
-        if (clientId !== socket.id) {
-          io.to(clientId).emit(ACTIONS.REMOVE_PEER, {
+        io.to(clientId).emit(ACTIONS.REMOVE_PEER, {
+          peerId: socket.id
+        })
+      })
+    } else {
+      const { rooms } = socket
+
+      Array.from(rooms).forEach(room => {
+        const clients = io.sockets.adapter.rooms.get(room) || []
+
+        Array.from(clients).forEach(client => {
+          io.to(client).emit(ACTIONS.REMOVE_PEER, {
             peerId: socket.id
           })
-  
-          socket.emit(ACTIONS.REMOVE_PEER, {
-            peerId: clientId
-          })
-        }
+        })
       })
-    })
+    }
   }
 
-  socket.on(ACTIONS.STOP_CALL, leaveRoom)
+  socket.on(ACTIONS.STOP_CALL, (roomId) => leaveRoom(roomId))
   socket.on('disconnect', leaveRoom)
   
   // ===========================

@@ -14,7 +14,7 @@ const ChannelList: React.FC<Props> = ({ channels }) => {
       <p className={cl.channels}>Channels</p>
       <ul className={cl.channelsList}>
         { channels.map(channel => 
-          <li className={cl.channel}>
+          <li key={channel.channelId} className={cl.channel}>
             <div className={cl.channelNameBox}>
               <p>{channel.name}</p>
               <img 
@@ -26,7 +26,7 @@ const ChannelList: React.FC<Props> = ({ channels }) => {
             </div>
             <ul className={cl.channelUsers}>
                 {channel.users.map(user => 
-                  <li className={cl.channelUser}>
+                  <li key={user.id} className={cl.channelUser}>
                     <img 
                       alt="user avatar" 
                       src={user.avatar || defImg} 

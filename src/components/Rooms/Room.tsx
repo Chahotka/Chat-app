@@ -35,12 +35,6 @@ const Room: React.FC = () => {
     }
   }, [room])
 
-  useEffect(() => {
-    return () => {
-      stopCall()
-    }
-  }, [])
-
   return (
     <div className={cl.room}>
       <Chat startCall={startCall} askPermission={askPermission}/>

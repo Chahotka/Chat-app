@@ -167,7 +167,7 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
       track.stop()
     })
 
-    socket.emit(ACTIONS.STOP_CALL)
+    socket.emit(ACTIONS.STOP_CALL, roomId)
     setCallState('disconnecting')
     setTimeout(() => setCallState('idle'), 1500)
   }
@@ -228,6 +228,9 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
         }
       }
       peerConnections.current[peerId].onconnectionstatechange = () => {
+        if (peerConnections.current[peerId].connectionState === 'failed') {
+          console.log('ERROR ESTABLISHING CONNECTION')
+        }
         console.log('CONNECTION STATE: ', peerConnections.current[peerId].connectionState)
       }
 
@@ -243,23 +246,25 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
       }
     }
     const onRemovePeer = ({ peerId }: {peerId: string}) => {
-      console.log('REMOVING PEER')
-      updateClients([], () => {
-        if (peerConnections.current[peerId]) {
-          peerConnections.current[peerId].close()
-        }
-
-        localCameraStream.current?.getTracks().forEach(track => {
-          track.stop()
+      console.log('peer in ', peerId in peerConnections.current)
+      if (peerId in peerConnections.current) {
+        updateClients([], () => {
+          if (peerConnections.current[peerId]) {
+            peerConnections.current[peerId].close()
+          }
+  
+          localCameraStream.current?.getTracks().forEach(track => {
+            track.stop()
+          })
+  
+          delete peerConnections.current[peerId]
+          delete peerMediaElements.current[peerId]
+          delete peerMediaElements.current[LOCAL_VIDEO]
+  
+          setCallState('disconnecting')
+          setTimeout(() => setCallState('idle'), 1500)
         })
-
-        delete peerConnections.current[peerId]
-        delete peerMediaElements.current[peerId]
-        delete peerMediaElements.current[LOCAL_VIDEO]
-
-        setCallState('disconnecting')
-        setTimeout(() => setCallState('idle'), 1500)
-      })
+      }
     }
     const onIceCandidate = ({ peerId, iceCandidate }: iceCandidate) => {
       console.log('RECEIVING ICE CANDIDATE')
@@ -298,6 +303,8 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
       socket.off(ACTIONS.ICE_CANDIDATE, onIceCandidate)
       socket.off(ACTIONS.SESSION_DESCRIPTION, onSessionDescription)
 
+      socket.emit(ACTIONS.STOP_CALL)
+      
       localCameraStream.current?.getTracks().forEach(track => track.stop())
       localScreenStream.current?.getTracks().forEach(track => track.stop())
     }
