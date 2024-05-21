@@ -4,10 +4,11 @@ import { ACTIONS } from "../../modules/Actions"
 import { socket } from "../../socket/socket"
 import freeice from 'freeice'
 import { useAppSelector } from "../../app/hooks"
+import { v4 } from "uuid"
 
 export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 
-export type Channel = {channelId: string, name: string, users: {name: string, id: string, avatar: string | null}[]}
+export type Channel = {channelId: string, name: string, users: {name: string, id: string, avatar: string | null, creator?: true}[]}
 
 export type CallState = 'calling' | 'receiving' | 'disconnecting' | 'inCall' | 'idle'
 export type CallPermission = { callerName: string, callerId: string }
@@ -26,38 +27,44 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
   const [callState, setCallState] = useState<CallState>('idle')
   const [isSharing, setIsSharing] = useState(false)
 
-
+  const [joinedId, setJoinedId] = useState<undefined | string>()
   const [groupChannels, setGroupChannels] = useState<Channel[]>([
     {
-      name: `Shokolatier's channel`,
-      channelId: '120-3-01890-31234-0891234-0981234089-1234',
+      name: 'Gubka Bob',
+      channelId: '123-12311-231-23-123',
       users: [
         {
-          id: '07629667-96bc-4aa4-bdf8-79dadfa074ce',
-          name: 'Shokolatier',
+          id: '12-312-3=15==1gg',
+          name: 'Gubka bob',
           avatar: null
         },
         {
-          id: 'ad370b55-e120-4aef-83f5-c1709728ed28',
-          name: 'Mojisola',
+          id: '12-312-3=15=sddsf=1gg',
+          name: 'Aboba',
           avatar: null
-        },
+        }
       ]
     },
     {
-      name: `Elipse's channel`,
-      channelId: '123908390u-0-90234-9012340-u93142',
+      name: 'Chechnya',
+      channelId: '123-12311-231-23-1231231',
       users: [
         {
-          id: '1730fa37-6eca-4ffe-a57b-f74fe04bafe6',
-          name: 'Elipse',
+          id: '12-312-3=15==1ggsd',
+          name: 'kavo',
           avatar: null
-        },
+        }
+      ]
+    },
+    {
+      name: 'Elkjadkl;jf',
+      channelId: '123-12311-231-bzxcvxcv-1231231',
+      users: [
         {
-          id: '3f914e9f-084f-420d-a56a-3402182d7992',
-          name: 'Magomrak',
+          id: '12-312-3=15==1uy452ggsd',
+          name: 'Kcvnao',
           avatar: null
-        },
+        }
       ]
     }
   ])
@@ -178,6 +185,93 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
       clientId: socketId,
       roomId
     })
+  }
+
+  const createChannel = () => {
+    const channelId = v4()
+
+    const joined = groupChannels.filter(channel => channel.channelId === joinedId)[0]
+    
+    if (joined) {
+      const channelUser = joined.users.filter(channelUser => channelUser.id === user.id)[0]
+
+      if (channelUser && channelUser.creator) {
+        return console.warn('You already created room')
+      } else {
+        joined.users = joined.users.filter(channelUser => channelUser.id !== user.id)
+        
+        const filteredChannels = groupChannels.filter(channel => channel.channelId !== joined.channelId)
+
+        setGroupChannels([
+          ...filteredChannels,
+          joined,
+          {
+            name: `${user.name}'s Channel`,
+            channelId,
+            users: [{
+              id: user.id,
+              name: user.name,
+              avatar: user.avatar,
+              creator: true
+            }]
+          }
+        ])
+        setJoinedId(channelId)
+      }
+    } else {
+      setGroupChannels(prev => [
+        ...prev,
+        {
+          name: `${user.name}'s Channel`,
+          channelId,
+          users: [{
+            id: user.id,
+            name: user.name,
+            avatar: user.avatar,
+            creator: true
+          }]
+        }
+      ])
+      setJoinedId(channelId)
+    }
+  }
+
+  const joinChannel = (id: string) => {
+    if (joinedId === id) {
+      return console.warn('You already joined this channel')
+    }
+
+    const joined = groupChannels.filter(channel => channel.channelId === joinedId)[0]
+    const channel = groupChannels.filter(channel => channel.channelId === id)[0]
+    
+    channel.users.push({
+      id: user.id,
+      name: user.name,
+      avatar: user.avatar
+    })
+    
+    const filteredChannels = groupChannels.filter(channel => {
+      if (
+        channel.channelId !== id && 
+        channel.channelId !== joinedId &&
+        channel.users.length > 0
+      ) {
+        return channel
+      }
+    })
+
+    let channels: Channel[] = []
+
+    if (joined && joined.users.length > 1) {
+      joined.users = joined.users.filter(channelUser => channelUser.id !== user.id)
+
+      channels = [...filteredChannels, channel, joined]
+    } else {
+      channels = [...filteredChannels, channel]
+    }
+
+    setJoinedId(id)
+    setGroupChannels(channels)
   }
 
   const provideMediaRef: ProvideRef = (id, node) => {
@@ -309,7 +403,7 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
       localScreenStream.current?.getTracks().forEach(track => track.stop())
     }
   }, [])
-
+  
 
   return {
     clients,
@@ -319,6 +413,8 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
     isSharing,
     setIsSharing,
     groupChannels,
+    createChannel,
+    joinChannel,
     localCameraStream,
     peerMediaElements,
     startCall,

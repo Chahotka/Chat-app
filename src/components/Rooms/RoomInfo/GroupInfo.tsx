@@ -8,13 +8,15 @@ import MembersList from './Group/MembersList'
 interface Props {
   room: GroupUser
   channels: Channel[]
+  createChannel: () => void
+  joinChannel: (id: string) => void
 }
 
-const GroupInfo: React.FC<Props> = ({ room, channels }) => {
+const GroupInfo: React.FC<Props> = ({ room, channels, createChannel, joinChannel }) => {
   
   return (
     <div className={cl.groupInfo}>
-      { channels.length > 0 && <ChannelList channels={channels}/>}
+      <ChannelList channels={channels} createChannel={createChannel} joinChannel={joinChannel}/>
       <MembersList room={room}/>
     </div>
   )

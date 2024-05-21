@@ -12,6 +12,7 @@ interface Props {
 const MembersList: React.FC<Props> = ({ room }) => {
   const userState = useAppSelector(state => state.user)
   const creator = userState.id === room.creator
+  const members = [...room.users].sort((a, b) => a.name.localeCompare(b.name))
   
   return (
     <>
@@ -37,7 +38,7 @@ const MembersList: React.FC<Props> = ({ room }) => {
               }
             </div>
           </li>
-        {room.users.map(user =>
+        {members.map(user =>
           <li key={user.id} className={cl.user}>
             <div className={cl.userAvatarWrapper}>
               <img
