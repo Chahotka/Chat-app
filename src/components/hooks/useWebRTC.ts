@@ -187,10 +187,67 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
     })
   }
 
+  const leaveChannel = (joining: boolean) => {
+    if (!joinedId) {
+      return groupChannels
+    }
+
+    const joined = groupChannels.filter(channel => channel.channelId === joinedId)[0]
+
+    if (joined.users.length >= 2) {
+      joined.users = joined.users.filter(channelUser => channelUser.id !== user.id)
+
+      const filteredChannels = groupChannels.filter(channel => channel.channelId !== joinedId)
+
+      if (joining) {
+        return [...filteredChannels, joined]
+      } else {
+        return setGroupChannels([...filteredChannels, joined])
+      }
+    }
+
+    if (joining) {
+      return groupChannels.filter(channel => channel.channelId !== joinedId)
+    } else {
+      return setGroupChannels(groupChannels.filter(channel => channel.channelId !== joinedId))
+    }
+    
+  }
+
+  const joinChannel = (id: string) => {
+    if (joinedId === id) {
+      return console.warn('You already joined this channel')
+    }
+
+    const channels = leaveChannel(true)
+
+    if (!channels) {
+      return
+    }
+
+    const channel = channels.filter(channel => channel.channelId === id)[0]
+    
+    channel.users.push({
+      id: user.id,
+      name: user.name,
+      avatar: user.avatar
+    })
+    
+    const filteredChannels = channels.filter(channel => channel.channelId !== id)
+
+    setJoinedId(id)
+    setGroupChannels([...filteredChannels, channel])
+  }
   const createChannel = () => {
     const channelId = v4()
 
-    const joined = groupChannels.filter(channel => channel.channelId === joinedId)[0]
+    const channels = leaveChannel(true)
+
+    if (!channels) {
+      return
+    }
+
+    const joined = channels.filter(channel => channel.channelId === joinedId)[0]
     
     if (joined) {
       const channelUser = joined.users.filter(channelUser => channelUser.id === user.id)[0]
@@ -198,9 +255,7 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
       if (channelUser && channelUser.creator) {
         return console.warn('You already created room')
       } else {
-        joined.users = joined.users.filter(channelUser => channelUser.id !== user.id)
-        
-        const filteredChannels = groupChannels.filter(channel => channel.channelId !== joined.channelId)
+        const filteredChannels = channels.filter(channel => channel.channelId !== joined.channelId)
 
         setGroupChannels([
           ...filteredChannels,
@@ -236,43 +291,6 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
     }
   }
 
-  const joinChannel = (id: string) => {
-    if (joinedId === id) {
-      return console.warn('You already joined this channel')
-    }
-
-    const joined = groupChannels.filter(channel => channel.channelId === joinedId)[0]
-    const channel = groupChannels.filter(channel => channel.channelId === id)[0]
-    
-    channel.users.push({
-      id: user.id,
-      name: user.name,
-      avatar: user.avatar
-    })
-    
-    const filteredChannels = groupChannels.filter(channel => {
-      if (
-        channel.channelId !== id && 
-        channel.channelId !== joinedId &&
-        channel.users.length > 0
-      ) {
-        return channel
-      }
-    })
-
-    let channels: Channel[] = []
-
-    if (joined && joined.users.length > 1) {
-      joined.users = joined.users.filter(channelUser => channelUser.id !== user.id)
-
-      channels = [...filteredChannels, channel, joined]
-    } else {
-      channels = [...filteredChannels, channel]
-    }
-
-    setJoinedId(id)
-    setGroupChannels(channels)
-  }
 
   const provideMediaRef: ProvideRef = (id, node) => {
     if (node) {
@@ -415,6 +433,7 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
     groupChannels,
     createChannel,
     joinChannel,
+    leaveChannel,
     localCameraStream,
     peerMediaElements,
     startCall,
