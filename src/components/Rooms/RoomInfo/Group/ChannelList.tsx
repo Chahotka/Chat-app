@@ -1,17 +1,20 @@
 import React from 'react'
 import cl from '../../../../styles/room-info.module.css'
-import defImg from '../../Mogged.png'
-import arrowImg from '../../../../images/Arrow.svg'
+import leave from '../../../../images/leave.svg'
+import join from '../../../../images/Arrow.svg'
 import { Channel } from '../../../hooks/useWebRTC'
 import Button from '../../../UI/Button/Button'
+import ChannelUsers from './Channel/ChannelUsers'
 
 interface Props {
+  joinedId: string | undefined
   channels: Channel[]
   createChannel: () => void
   joinChannel: (id: string) => void
+  leaveChannel: (joining: boolean) => void | Channel[]
 }
 
-const ChannelList: React.FC<Props> = ({ channels, createChannel, joinChannel }) => {
+const ChannelList: React.FC<Props> = ({ joinedId, channels, createChannel, joinChannel, leaveChannel }) => {
   const sortedChannels = channels.sort((a, b) => a.name.localeCompare(b.name))
 
   return (
@@ -34,26 +37,27 @@ const ChannelList: React.FC<Props> = ({ channels, createChannel, joinChannel }) 
           <li key={channel.channelId} className={cl.channel}>
             <div className={cl.channelNameBox}>
               <p>{channel.name}</p>
-              <img 
-                alt="join channel" 
-                title='Join channel'
-                src={arrowImg}
-                className={cl.joinChannel}
-                onClick={() => joinChannel(channel.channelId)}
-              />
+              { channel.channelId === joinedId
+                // dopisat razlichie esli v komnate i vne
+                ?
+                <img 
+                  alt='Leave Channel'
+                  title='Leave Channel'
+                  src={leave}
+                  className={cl.joinChannel}
+                  onClick={() => leaveChannel(false)}
+                />
+                :
+                <img 
+                  alt="join channel" 
+                  title='Join channel'
+                  src={join}
+                  className={cl.joinChannel}
+                  onClick={() => joinChannel(channel.channelId)}
+                />
+              }
             </div>
-            <ul className={cl.channelUsers}>
-                {channel.users.sort((a, b) => a.name.localeCompare(b.name)).map(user => 
-                  <li key={user.id} className={cl.channelUser}>
-                    <img 
-                      alt="user avatar" 
-                      src={user.avatar || defImg} 
-                      className={cl.channelAvatar}
-                    />
-                    <p className={cl.userName}>{ user.name }</p>
-                  </li>
-                )}
-            </ul>
+            <ChannelUsers channel={channel}/>
           </li>
         )}
       </ul>

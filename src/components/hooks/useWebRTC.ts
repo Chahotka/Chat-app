@@ -191,6 +191,9 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
     if (!joinedId) {
       return groupChannels
     }
+    if (!joining) {
+      setJoinedId(undefined)
+    }
 
     const joined = groupChannels.filter(channel => channel.channelId === joinedId)[0]
 
@@ -430,6 +433,7 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
     setCallState,
     isSharing,
     setIsSharing,
+    joinedId,
     groupChannels,
     createChannel,
     joinChannel,

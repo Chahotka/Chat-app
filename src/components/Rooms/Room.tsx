@@ -18,9 +18,11 @@ const Room: React.FC = () => {
     callState,
     isSharing,
     setIsSharing,
+    joinedId,
     groupChannels,
     createChannel,
     joinChannel,
+    leaveChannel,
     localCameraStream,
     peerMediaElements,
     startCall,
@@ -40,7 +42,13 @@ const Room: React.FC = () => {
   return (
     <div className={cl.room}>
       <Chat startCall={startCall} askPermission={askPermission}/>
-      <RoomInfo groupChannels={groupChannels} createChannel={createChannel} joinChannel={joinChannel} />
+      <RoomInfo 
+        joinedId={joinedId}
+        groupChannels={groupChannels} 
+        createChannel={createChannel} 
+        joinChannel={joinChannel} 
+        leaveChannel={leaveChannel}
+      />
       {
         callState !== 'idle' &&
         <CallRoom

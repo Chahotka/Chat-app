@@ -7,12 +7,14 @@ import GroupInfo from './RoomInfo/GroupInfo'
 import { Channel } from '../hooks/useWebRTC'
 
 interface Props {
+  joinedId: string | undefined
   groupChannels: Channel[]
   createChannel: () => void
   joinChannel: (id: string) => void
+  leaveChannel: (joining: boolean) => void | Channel[]
 }
 
-const RoomInfo: React.FC<Props> = ({ groupChannels, createChannel, joinChannel }) => {
+const RoomInfo: React.FC<Props> = ({ joinedId, groupChannels, createChannel, joinChannel, leaveChannel}) => {
   const room = useAppSelector(state => state.user.activeRoom)
 
   if (!room) {
@@ -32,7 +34,14 @@ const RoomInfo: React.FC<Props> = ({ groupChannels, createChannel, joinChannel }
         <p className={cl.roomName}>{ room.name }</p>
         { room.type === 'direct'
           ? <DirectInfo room={room}/>
-          : <GroupInfo room={room} channels={groupChannels} createChannel={createChannel} joinChannel={joinChannel}/>
+          : <GroupInfo 
+              room={room} 
+              joinedId={joinedId}
+              channels={groupChannels} 
+              createChannel={createChannel} 
+              joinChannel={joinChannel}
+              leaveChannel={leaveChannel}
+            />
         }
       </div>
     </div>
