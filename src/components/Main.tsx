@@ -14,7 +14,6 @@ const Main: React.FC = () => {
   const { resizing, setResizing, roomsWidth, grid, onMove } = useResizer()
 
   useEffect(() => {
-    console.log('main re-rendering')
     const storedUser = sessionStorage.getItem('user')
 
     if (typeof storedUser === 'string') {

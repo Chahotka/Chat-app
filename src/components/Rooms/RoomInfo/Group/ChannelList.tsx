@@ -11,7 +11,7 @@ interface Props {
   channels: Channel[]
   createChannel: () => void
   joinChannel: (id: string) => void
-  leaveChannel: (joining: boolean) => void | Channel[]
+  leaveChannel: () => void
 }
 
 const ChannelList: React.FC<Props> = ({ joinedId, channels, createChannel, joinChannel, leaveChannel }) => {
@@ -38,14 +38,13 @@ const ChannelList: React.FC<Props> = ({ joinedId, channels, createChannel, joinC
             <div className={cl.channelNameBox}>
               <p>{channel.name}</p>
               { channel.channelId === joinedId
-                // dopisat razlichie esli v komnate i vne
                 ?
                 <img 
                   alt='Leave Channel'
                   title='Leave Channel'
                   src={leave}
                   className={cl.joinChannel}
-                  onClick={() => leaveChannel(false)}
+                  onClick={() => leaveChannel()}
                 />
                 :
                 <img 

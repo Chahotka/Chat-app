@@ -17,9 +17,6 @@ const Messages: React.FC<Props> = ({  messages }) => {
     }
   }, [messages])
 
-  useEffect(() => {
-    console.log('messages re-rendering')
-  }, [])
   
   return (
     <div className={cl.container}>

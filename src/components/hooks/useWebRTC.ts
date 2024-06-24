@@ -10,7 +10,7 @@ import { useChannel } from "./useChannel"
 
 export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 
-export type Channel = {channelId: string, name: string, users: {name: string, id: string, avatar: string | null, creator?: true}[]}
+export type Channel = {channelId: string, name: string, users: {name: string, id: string, avatar: string | null, socketId: string, creator?: true}[]}
 
 export type CallState = 'calling' | 'receiving' | 'disconnecting' | 'inCall' | 'idle'
 export type CallPermission = { callerName: string, callerId: string }
@@ -42,7 +42,7 @@ export const useWebRTC = (roomId: string | undefined, type: string | undefined) 
     joinChannel,
     leaveChannel,
     createChannel
-  } = useChannel()
+  } = useChannel(roomId)
 
 
   const askPermission = () => {

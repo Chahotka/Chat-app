@@ -1,164 +1,112 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Channel } from "./useWebRTC"
 import { useAppSelector } from "../../app/hooks"
 import { v4 } from "uuid"
+import { socket } from "../../socket/socket"
+import { ACTIONS } from "../../modules/Actions"
 
-export const useChannel = () => {
+export const useChannel = (
+  roomId: string | undefined
+) => {
   const user = useAppSelector(state => state.user)
   
   const [joinedId, setJoinedId] = useState<undefined | string>()
-  const [groupChannels, setGroupChannels] = useState<Channel[]>([
-    {
-      name: 'Gubka Bob',
-      channelId: '123-12311-231-23-123',
-      users: [
-        {
-          id: '12-312-3=15==1gg',
-          name: 'Gubka bob',
-          avatar: null
-        },
-        {
-          id: '12-312-3=15=sddsf=1gg',
-          name: 'Aboba',
-          avatar: null
-        }
-      ]
-    },
-    {
-      name: 'Chechnya',
-      channelId: '123-12311-231-23-1231231',
-      users: [
-        {
-          id: '12-312-3=15==1ggsd',
-          name: 'kavo',
-          avatar: null
-        }
-      ]
-    },
-    {
-      name: 'Elkjadkl;jf',
-      channelId: '123-12311-231-bzxcvxcv-1231231',
-      users: [
-        {
-          id: '12-312-3=15==1uy452ggsd',
-          name: 'Kcvnao',
-          avatar: null
-        }
-      ]
-    }
-  ])
-
-
-  
-  const leaveChannel = (joining: boolean) => {
-    if (!joinedId) {
-      return groupChannels
-    }
-    if (!joining) {
-      setJoinedId(undefined)
-    }
-
-    const joined = groupChannels.filter(channel => channel.channelId === joinedId)[0]
-
-    if (joined.users.length >= 2) {
-      joined.users = joined.users.filter(channelUser => channelUser.id !== user.id)
-
-      const filteredChannels = groupChannels.filter(channel => channel.channelId !== joinedId)
-
-      if (joining) {
-        return [...filteredChannels, joined]
-      } else {
-        return setGroupChannels([...filteredChannels, joined])
-      }
-    }
-
-    if (joining) {
-      return groupChannels.filter(channel => channel.channelId !== joinedId)
-    } else {
-      return setGroupChannels(groupChannels.filter(channel => channel.channelId !== joinedId))
-    }
-    
-  }
+  const [groupChannels, setGroupChannels] = useState<Channel[]>([])
 
   const joinChannel = (id: string) => {
-    if (joinedId === id) {
-      return console.warn('You already joined this channel')
-    }
-
-    const channels = leaveChannel(true)
-
-    if (!channels) {
+    if (!socket.id) { 
       return
     }
+    if (joinedId) {
+      leaveChannel()
+    }
 
-    const channel = channels.filter(channel => channel.channelId === id)[0]
-    
+    const channel = groupChannels.filter(c => c.channelId === id)[0]
+    const filteredChannels = groupChannels.filter(c => c.channelId !== id)
+
     channel.users.push({
       id: user.id,
       name: user.name,
-      avatar: user.avatar
+      avatar: user.avatar,
+      socketId: socket.id
     })
-    
-    const filteredChannels = channels.filter(channel => channel.channelId !== id)
+
+    const channels = [...filteredChannels, channel].filter(c => c.users.length > 0)
 
     setJoinedId(id)
-    setGroupChannels([...filteredChannels, channel])
+    setGroupChannels(channels)
+
+    socket.emit(ACTIONS.JOIN_CHANNEL, roomId, channel)
+  }
+
+  const leaveChannel = () => {
+    const channel = groupChannels.filter(c => c.channelId === joinedId)[0]
+    const filteredChannels = groupChannels.filter(c => c.channelId !== joinedId)
+
+    channel.users = channel.users.filter(u => u.id !== user.id)
+
+    const channels = [...filteredChannels, channel].filter(c => c.users.length > 0)
+
+    setJoinedId(undefined)
+    setGroupChannels(channels)
+
+    socket.emit(ACTIONS.LEAVE_CHANNEL, roomId, channel)
   }
 
   const createChannel = () => {
-    const channelId = v4()
-
-    const channels = leaveChannel(true)
-
-    if (!channels) {
+    if (!socket.id) {
       return
     }
 
-    const joined = groupChannels.filter(channel => channel.channelId === joinedId)[0]
-    
-    if (joined) {
-      const channelUser = joined.users.filter(channelUser => channelUser.id === user.id)[0]
+    if (joinedId) {
+      const channel = groupChannels.filter(c => c.channelId === joinedId)[0]
+      const creator = channel.users.filter(u => u.creator)[0]
 
-      if (channelUser && channelUser.creator) {
-        return console.warn('You already created room')
+      if (creator?.id === user.id) {
+        return console.warn('Already created channel')
       } else {
-
-        joined.users = joined.users.filter(channelUser => channelUser.id !== user.id)
-        const filteredChannels = channels.filter(channel => channel.channelId !== joined.channelId)
-
-        setGroupChannels([
-          ...filteredChannels,
-          joined,
-          {
-            name: `${user.name}'s Channel`,
-            channelId,
-            users: [{
-              id: user.id,
-              name: user.name,
-              avatar: user.avatar,
-              creator: true
-            }]
-          }
-        ])
-        setJoinedId(channelId)
+        leaveChannel()
       }
-    } else {
-      setGroupChannels(prev => [
-        ...prev,
-        {
-          name: `${user.name}'s Channel`,
-          channelId,
-          users: [{
-            id: user.id,
-            name: user.name,
-            avatar: user.avatar,
-            creator: true
-          }]
-        }
-      ])
-      setJoinedId(channelId)
     }
+
+    const channelId = v4()
+
+    const channel: Channel = {
+      name: `${user.name}'s channel`,
+      channelId,
+      users: [{
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar,
+        creator: true,
+        socketId: socket.id,
+      }]
+    }
+
+    setJoinedId(channelId)
+    setGroupChannels(prev => [...prev, channel])
+
+    socket.emit(ACTIONS.CREATE_CHANNEL, roomId, channel)
   }
+  
+  useEffect(() => {
+    const onShare = (channel: Channel[]) => {
+      console.log('shara', channel)
+      setGroupChannels(channel)
+    }
+
+
+    console.log(groupChannels)
+
+    socket.on(ACTIONS.SHARE_CHANNELS, onShare)
+    return () => {
+      socket.off(ACTIONS.SHARE_CHANNELS, onShare)
+    }
+  }, [groupChannels])
+
+  useEffect(() => {
+    socket.emit(ACTIONS.GET_CHANNELS, roomId)
+  }, [])
 
   return {
     joinedId,

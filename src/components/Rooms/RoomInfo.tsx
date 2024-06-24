@@ -11,7 +11,7 @@ interface Props {
   groupChannels: Channel[]
   createChannel: () => void
   joinChannel: (id: string) => void
-  leaveChannel: (joining: boolean) => void | Channel[]
+  leaveChannel: () => void
 }
 
 const RoomInfo: React.FC<Props> = ({ joinedId, groupChannels, createChannel, joinChannel, leaveChannel}) => {

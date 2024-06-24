@@ -4,6 +4,7 @@ import { CallPermission, CallState, LOCAL_VIDEO } from "./useWebRTC"
 import { socket } from "../../socket/socket"
 import freeice from 'freeice'
 import { ACTIONS } from "../../modules/Actions"
+import { useAppDispatch, useAppSelector } from "../../app/hooks"
 
 type AddPeer = { peerId: string, createOffer: boolean }
 type iceCandidate = { peerId: string, iceCandidate: RTCIceCandidate }
@@ -121,6 +122,7 @@ export const usePeerConnections = (
           delete peerMediaElements.current[peerId]
           delete peerMediaElements.current[LOCAL_VIDEO]
   
+          console.log('REMOVING PEER', peerId)
           setCallState('disconnecting')
           setTimeout(() => setCallState('idle'), 1500)
         })

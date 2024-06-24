@@ -129,19 +129,33 @@ app.listen(5000, () => {
 
 // SOCKET.IO
 
-const shareChannel = (roomId: string, userId: string) => {
-  io.to(roomId).emit(ACTIONS.SHARE_GROUP, {
-    roomId,
-    userId
-  })
+
+type Channel = {
+  name: string,
+  channelId: string
+  users: {
+    id: string,
+    name: string,
+    avatar: string | null
+    socketId: string
+  }[]
 }
+
+type ChannelList = {
+  [key: string]: {
+    roomId: string,
+    channels: Channel[]
+  }
+}
+
+const channels: ChannelList = {}
+
 
 io.on('connect', (socket) => {
   console.log('socket  connected')
   socketHandler.onConnect(socket)
 
   socket.on('join rooms', (roomIds) => {
-    console.log('joining rooms, ', roomIds)
     socketHandler.onJoin(socket, roomIds)
   })
 
@@ -152,7 +166,7 @@ io.on('connect', (socket) => {
   socket.on('send message', (messageObject) => {
     socketHandler.onSendMessage(socket, messageObject)
   })
-  // ==================================
+
   socket.on(ACTIONS.ASK_PERMISSION, ({ caller, roomId }) => {
     const clients = io.sockets.adapter.rooms.get(roomId) || []
 
@@ -204,7 +218,7 @@ io.on('connect', (socket) => {
     })
   })
 
-  const leaveRoom = (roomId: string | undefined) => {
+  const leaveRoom = (roomId: string | undefined, channel?: Channel | undefined) => {
     if (roomId) {
       const clients = io.sockets.adapter.rooms.get(roomId) || []
   
@@ -213,25 +227,80 @@ io.on('connect', (socket) => {
           peerId: socket.id
         })
       })
-    } else {
-      const { rooms } = socket
-
-      Array.from(rooms).forEach(room => {
-        const clients = io.sockets.adapter.rooms.get(room) || []
-
-        Array.from(clients).forEach(client => {
-          io.to(client).emit(ACTIONS.REMOVE_PEER, {
-            peerId: socket.id
-          })
-        })
-      })
-    }
+    } 
   }
-
+  
+// Комнаты удаляются из-за leave room
   socket.on(ACTIONS.STOP_CALL, (roomId) => leaveRoom(roomId))
-  socket.on('disconnect', leaveRoom)
+  socket.on('disconnect', () => {
+    
+  })
   
   // ===========================
+
+  socket.on(ACTIONS.GET_CHANNELS, (roomId: string) => {
+    if (channels[roomId]) {
+      socket.emit(ACTIONS.SHARE_CHANNELS, channels[roomId].channels)
+    }
+    console.log('GET CHANNELS')
+  })
+
+  socket.on(ACTIONS.CREATE_CHANNEL, (roomId: string, channel: Channel) => {
+    if (roomId in channels) {
+      channels[roomId].channels.push(channel)
+    } else {
+      channels[roomId] = {
+        roomId,
+        channels: [channel]
+      }
+    }
+
+    const clients = io.sockets.adapter.rooms.get(roomId) || []
+
+    Array.from(clients).forEach(client => {
+      if (client !== socket.id) {
+        io.to(client).emit(ACTIONS.SHARE_CHANNELS, channels[roomId].channels)
+      }
+    })
+    console.log('CREATE CHANNEL')
+  })
+
+  socket.on(ACTIONS.JOIN_CHANNEL, (roomId: string, channel: Channel) => {
+    const filteredChannels = channels[roomId].channels.filter(c => c.channelId !== channel.channelId)
+
+    channels[roomId].channels = [...filteredChannels, channel]
+
+    const clients = io.sockets.adapter.rooms.get(roomId) || []
+
+    Array.from(clients).forEach(client => {
+      if (socket.id !== client) {
+        console.log(client)
+        io.to(roomId).emit(ACTIONS.SHARE_CHANNELS, channels[roomId].channels)
+      }
+    })
+    console.log('JOIN CHANNEL')
+  })
+
+  socket.on(ACTIONS.LEAVE_CHANNEL, (roomId: string, channel: Channel) => {
+    const filteredChannels = channels[roomId].channels.filter(c => c.channelId !== channel.channelId)
+
+    channels[roomId].channels = channel.users.length > 0 
+      ? [...filteredChannels, channel] 
+      : filteredChannels
+
+    const sockets = io.sockets.adapter.rooms.get(roomId) || []
+
+
+    Array.from(sockets).forEach(client => {
+      if (client !== socket.id) {
+        io.to(client).emit(ACTIONS.SHARE_CHANNELS, channels[roomId].channels)
+      }}
+    )
+  })
+
+
+  // ==================================
+
   socket.on('connection_error', (err) => {
     console.log(err.req)
     console.log(err.code)
