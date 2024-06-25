@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express'
+import util from 'node:util'
 import bp from 'body-parser'
 import dotenv from 'dotenv/config'
 import cors from 'cors'
@@ -116,7 +117,7 @@ app.post('/get-rooms', async (req: Request, res: Response) => {
   res.send(rooms)
 })
 app.post('/create-group', async (req: Request, res: Response) => {
-  const {groupId, creatorId, groupName, selectedUsers } = req.body
+  const { groupId, creatorId, groupName, selectedUsers } = req.body
 
   const response = await dbHandler.createGroup(groupName, groupId, creatorId, selectedUsers)
 
@@ -152,7 +153,7 @@ const channels: ChannelList = {}
 
 
 io.on('connect', (socket) => {
-  console.log('socket  connected')
+  console.log('SOCKET ', socket.id, ' CONNECTED')
   socketHandler.onConnect(socket)
 
   socket.on('join rooms', (roomIds) => {
@@ -179,7 +180,7 @@ io.on('connect', (socket) => {
       }
     })
   })
-  socket.on(ACTIONS.CALL, ({ roomId }) => { 
+  socket.on(ACTIONS.CALL, ({ roomId }) => {
     console.log('CALLING EVENT')
     const clients = io.sockets.adapter.rooms.get(roomId) || []
     console.log('CLIENTS: ', clients)
@@ -195,7 +196,7 @@ io.on('connect', (socket) => {
       })
     })
   })
-  socket.on(ACTIONS.RELAY_ICE, ({ peerId, iceCandidate}) => {
+  socket.on(ACTIONS.RELAY_ICE, ({ peerId, iceCandidate }) => {
     console.log('RELAY ICE EVENT')
     io.to(peerId).emit(ACTIONS.ICE_CANDIDATE, {
       peerId: socket.id,
@@ -218,31 +219,67 @@ io.on('connect', (socket) => {
     })
   })
 
-  const leaveRoom = (roomId: string | undefined, channel?: Channel | undefined) => {
+  const leaveRoom = (roomId?: string) => {
     if (roomId) {
       const clients = io.sockets.adapter.rooms.get(roomId) || []
-  
+
       Array.from(clients).forEach(clientId => {
         io.to(clientId).emit(ACTIONS.REMOVE_PEER, {
           peerId: socket.id
         })
       })
-    } 
+    } else {
+      console.log(socket.rooms)
+    }
   }
+
+  const leaveChannel = (roomId?: string, channel?: Channel) => {
+    if (roomId && channel) {
+      const filteredChannels = channels[roomId].channels.filter(c => c.channelId !== channel.channelId)
   
-// Комнаты удаляются из-за leave room
+      channels[roomId].channels = channel.users.length > 0
+        ? [...filteredChannels, channel]
+        : filteredChannels
+  
+      const sockets = io.sockets.adapter.rooms.get(roomId) || []
+  
+  
+      Array.from(sockets).forEach(client => {
+        if (client !== socket.id) {
+          io.to(client).emit(ACTIONS.SHARE_CHANNELS, channels[roomId].channels)
+        }
+      })
+    } else {
+      for (let key in channels) {
+        const groups = channels[key].channels
+        groups.map(c => {
+          c.users = c.users.filter(u => u.socketId !== socket.id)
+        })
+  
+        channels[key].channels = groups.filter(c => c.users.length > 0)
+  
+        io.to(channels[key].roomId).emit(ACTIONS.SHARE_CHANNELS, channels[key].channels)
+      }
+  
+      console.log(util.inspect(channels, {depth: null, colors: true}))
+      console.log('SOCKET - ', socket.id, ' DISCONNECTED')
+    }
+  }
+
   socket.on(ACTIONS.STOP_CALL, (roomId) => leaveRoom(roomId))
-  socket.on('disconnect', () => {
-    
-  })
-  
+
   // ===========================
 
   socket.on(ACTIONS.GET_CHANNELS, (roomId: string) => {
+
+
+
+
+
+
     if (channels[roomId]) {
       socket.emit(ACTIONS.SHARE_CHANNELS, channels[roomId].channels)
     }
-    console.log('GET CHANNELS')
   })
 
   socket.on(ACTIONS.CREATE_CHANNEL, (roomId: string, channel: Channel) => {
@@ -262,7 +299,6 @@ io.on('connect', (socket) => {
         io.to(client).emit(ACTIONS.SHARE_CHANNELS, channels[roomId].channels)
       }
     })
-    console.log('CREATE CHANNEL')
   })
 
   socket.on(ACTIONS.JOIN_CHANNEL, (roomId: string, channel: Channel) => {
@@ -278,26 +314,17 @@ io.on('connect', (socket) => {
         io.to(roomId).emit(ACTIONS.SHARE_CHANNELS, channels[roomId].channels)
       }
     })
-    console.log('JOIN CHANNEL')
   })
 
   socket.on(ACTIONS.LEAVE_CHANNEL, (roomId: string, channel: Channel) => {
-    const filteredChannels = channels[roomId].channels.filter(c => c.channelId !== channel.channelId)
-
-    channels[roomId].channels = channel.users.length > 0 
-      ? [...filteredChannels, channel] 
-      : filteredChannels
-
-    const sockets = io.sockets.adapter.rooms.get(roomId) || []
-
-
-    Array.from(sockets).forEach(client => {
-      if (client !== socket.id) {
-        io.to(client).emit(ACTIONS.SHARE_CHANNELS, channels[roomId].channels)
-      }}
-    )
+    leaveChannel(roomId, channel)
   })
 
+
+  socket.on('disconnect', () => {
+    leaveChannel()
+    leaveRoom()
+  })
 
   // ==================================
 
