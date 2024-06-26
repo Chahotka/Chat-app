@@ -91,6 +91,8 @@ export const usePeerConnections = (
       peerConnections.current[peerId].onconnectionstatechange = () => {
         if (peerConnections.current[peerId].connectionState === 'failed') {
           console.log('ERROR ESTABLISHING CONNECTION')
+        } else if (peerConnections.current[peerId].connectionState === 'disconnected') {
+          onRemovePeer({peerId})
         }
         console.log('CONNECTION STATE: ', peerConnections.current[peerId].connectionState)
       }

@@ -228,8 +228,6 @@ io.on('connect', (socket) => {
           peerId: socket.id
         })
       })
-    } else {
-      console.log(socket.rooms)
     }
   }
 
