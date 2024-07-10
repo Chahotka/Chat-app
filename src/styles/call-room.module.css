@@ -1,338 +1,81 @@
 .callRoom {
-  bottom: 0;
   left: 0;
+  bottom: 0;
   width: 100%;
   height: 100%;
-  position: absolute;
-  background: rgb(21, 19, 41);
-  background: linear-gradient(rgb(21, 19, 41) 20%, rgb(17, 10, 10) 100%);
+  background: #322e42;
+  background: linear-gradient(
+    rgb(50, 46, 66),
+    rgb(22, 22, 22)
+  );
   overflow: hidden;
+  position: absolute;
   transition: all 0.3s;
   z-index: 3;
 }
 
 .callRoom.hidden {
-  height: 0%;
+  height: 0;
   overflow: visible;
 }
 
-.roller {
-  top: 15px;
-  right: 15px;
+.hideButton {
+  top: 10px;
+  right: 10px;
   width: 30px;
   height: 30px;
   cursor: pointer;
   position: absolute;
   border-radius: 50%;
-  background: transparent;
+  transition: all 0.3s;
 }
 
+.hideButton:hover {
+  background: #ffffff18;
+}
 
-.roller::after,
-.roller::before {
+.hideButton::after,
+.hideButton::before {
+  content: '';
+  top: 16px;
+  width: 13px;
+  height: 1px;
+  background: #fff;
+  position: absolute;
+  transition: all 0.3s;
+}
+
+.hideButton::after {
+  left: 4px;
+  rotate: 45deg;
+}
+
+.hideButton::before {
+  left: 13px;
+  rotate: -45deg;
+}
+
+.hideButton.hidden {
+  top: -40px;
+  background: #ffffff;
+}
+
+.hideButton.hidden::after,
+.hideButton.hidden::before {
   content: '';
   top: 14px;
-  width: 16px;
-  height: 2px;
-  background: #fff;
-  position: absolute;
-  transition: all 0.3s;
-}
-.roller::after {
-  rotate: 45deg;
-  left: 2px;
-}
-.roller::before {
-  rotate: -45deg;
-  left: 12px;
-}
-
-.roller.hidden {
-  top: -50px;
-  background: #fff;
-}
-
-.roller.hidden::after {
-  background: #000;
-  rotate: -45deg;
-}
-.roller.roller.hidden::before {
-  background: #000;
-  rotate: 45deg;
-}
-
-.receiving {
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  gap: 20px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  position: absolute;
-  overflow: hidden;
-}
-
-.caller {
-}
-
-.callerName {
-  font-weight: 700;
-  letter-spacing: 2px;
-}
-
-.receivingOptions {
-  gap: 20px;
-  display: flex;
-}
-.receivingOption {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: green;
-  position: relative;
-  transition: all 0.3s;
-  opacity: 0.7;
-}
-.receivingOption:hover {
-  opacity: 1;
-  scale: 1.1;
-}
-.receivingOption.red {
-  rotate: -136deg;
-  background: red;
-}
-.receivingOption img {
-  top: 50%;
-  left: 50%;
-  width: 25px;
-  transform: translate(-52%,-52%);
-  position: absolute;
-}
-
-.receivingBg {
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  position: absolute;
-  filter: brightness(40%);
-}
-
-.calling {
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  gap: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  overflow: hidden;
-}
-
-.callingText {
-  font-size: 20px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.dot {
-  position: relative;
-}
-
-.dot span {
-  top: 0;
-  left: 0;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #fff;
-  position: absolute;
-  animation: jump 1s infinite;
-}
-
-.dot::after,
-.dot::before {
-  top: 0;
-  content: '';
-  width: 5px;
-  height: 5px;
-  background: #fff;
-  border-radius: 50%;
-  position: absolute;
-  animation: jump 1s infinite;
-}
-
-.dot::after {
-  left: 10px;
-  animation-delay: .2s;
-}
-.dot::before {
-  left: 20px;
-  animation-delay: .3s;
-}
-
-@keyframes jump {
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-.inCall {
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  gap: 40px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  position: absolute;
-  overflow: hidden;
-}
-
-.clients {
-  gap: 20px;
-  display: flex;
-}
-
-.client {
-  width: 250px;
-  height: 170px;
-  border-radius: 10px;
-  border: 1px solid #fff;
-  position: relative;
-  overflow: hidden;
-}
-
-.client:hover .clientOptions {
-  opacity: 1;
-}
-
-.hideClient {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  background: #271b1b;
-  position: absolute;
-}
-.hideClient img {
-  top: 50%;
-  left: 50%;
-  width: 100px;
-  border-radius: 50%;
-  position: absolute;
-  transform: translate(-50%,-50%);
-}
-
-.hideClient.hide {
-  opacity: 1;
-}
-
-.clientVideo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.clientVideoBg {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  position: absolute;
-  background: #000;
-  transition: all 0.3s;
-}
-
-.clientVideoBg.show {
-  opacity: 1;
-}
-
-.clientOptions {
-  padding: 0 10px;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  position: absolute;
-  opacity: 0;
-  transition: all 0.3s;
-  background: #00000080;
-}
-
-.clientOption {
-  position: relative;
-}
-
-.clientOption::before {
-  content: '';
-  top: 9px;
-  left: 50%;
-  width: 0;
+  width: 13px;
   height: 1px;
-  rotate: 50deg;
-  translate: -50%;
-  background: #fff;
+  background: #000000;
   position: absolute;
   transition: all 0.3s;
 }
 
-.clientOption.active::before {
-  width: 25px;
+.hideButton.hidden::after {
+  rotate: -45deg;
 }
 
-.clientOption.active img {
-  opacity: 0.5;
+.hideButton.hidden::before {
+  rotate: 45deg;
 }
 
-
-.clientOption img {
-  width: 20px;
-}
-
-.clientOptionText {
-  padding: 5px;
-  top: -30px;
-  left: 50%;
-  translate: -50%;
-  font-size: 10px;
-  text-transform: uppercase;
-  background: #0000009d;
-  border-radius: 20px;
-  opacity: 0;
-  position: absolute;
-  transition: all 0.3s;
-  white-space: nowrap;
-}
-
-.clientOption:hover .clientOptionText {
-  opacity: 1;
-}
-
-.disconnecting {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  overflow: hidden;
-}
-
-.disconnectingText {
-  font-size: 20px;
-  font-weight: 600;
-}
